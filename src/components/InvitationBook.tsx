@@ -1,11 +1,184 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface InvitationBookProps {
   onProceed: () => void;
 }
+
+// Themed decorations for each event
+const MehendiDecor = () => (
+  <div className="event-decor mehendi-decor">
+    {/* Henna/Paisley patterns */}
+    <svg className="decor-svg decor-top-left" viewBox="0 0 60 60" width="50" height="50">
+      <path d="M30 5 Q45 15 40 30 Q35 45 20 45 Q10 40 10 25 Q15 10 30 5" fill="none" stroke="#ff6b35" strokeWidth="2" opacity="0.6"/>
+      <circle cx="25" cy="25" r="5" fill="#ff6b35" opacity="0.4"/>
+      <path d="M20 35 Q25 40 30 35" fill="none" stroke="#ff6b35" strokeWidth="1.5" opacity="0.5"/>
+    </svg>
+    <svg className="decor-svg decor-top-right" viewBox="0 0 60 60" width="45" height="45">
+      <path d="M30 10 Q40 20 35 35 Q25 45 15 35 Q10 25 20 15 Q25 10 30 10" fill="none" stroke="#ff6b35" strokeWidth="2" opacity="0.5"/>
+      <circle cx="28" cy="28" r="3" fill="#ff6b35" opacity="0.4"/>
+    </svg>
+    {/* Floating flowers */}
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="floating-flower"
+        style={{ left: `${15 + i * 18}%`, top: `${10 + (i % 3) * 5}%` }}
+        animate={{ y: [0, -8, 0], rotate: [0, 10, 0] }}
+        transition={{ duration: 2 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        🌸
+      </motion.div>
+    ))}
+    {/* Henna hand icon */}
+    <div className="decor-center-icon">✋</div>
+  </div>
+);
+
+const SangeetDecor = () => (
+  <div className="event-decor sangeet-decor">
+    {/* Music wave animation */}
+    <div className="music-waves">
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="wave-bar"
+          style={{ backgroundColor: '#ff69b4' }}
+          animate={{ scaleY: [0.3, 1, 0.3] }}
+          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+    {/* Floating music notes */}
+    {['♪', '♫', '♬', '🎵', '🎶'].map((note, i) => (
+      <motion.div
+        key={i}
+        className="floating-note"
+        style={{ left: `${10 + i * 20}%`, color: '#ff69b4' }}
+        animate={{ y: [0, -15, 0], x: [0, 5, 0], opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 1.5 + i * 0.2, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+      >
+        {note}
+      </motion.div>
+    ))}
+    {/* Disco lights effect */}
+    <div className="disco-lights">
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="disco-dot"
+          style={{ left: `${20 + i * 30}%`, backgroundColor: ['#ff69b4', '#ffd700', '#ff6b35'][i] }}
+          animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+          transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const HaldiDecor = () => (
+  <div className="event-decor haldi-decor">
+    {/* Marigold flowers */}
+    {['🌼', '🌻', '💛', '🌼', '✨'].map((flower, i) => (
+      <motion.div
+        key={i}
+        className="floating-marigold"
+        style={{ left: `${8 + i * 20}%`, top: `${5 + (i % 2) * 10}%` }}
+        animate={{ y: [0, -10, 0], rotate: [0, 15, -15, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+      >
+        {flower}
+      </motion.div>
+    ))}
+    {/* Turmeric drops */}
+    <svg className="decor-svg decor-bottom" viewBox="0 0 100 30" width="100" height="30">
+      {[15, 35, 55, 75, 85].map((x, i) => (
+        <motion.circle
+          key={i}
+          cx={x}
+          cy="15"
+          r="6"
+          fill="#ffd700"
+          opacity="0.5"
+          animate={{ cy: [15, 20, 15], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+        />
+      ))}
+    </svg>
+    {/* Golden sparkles */}
+    <div className="golden-sparkles">
+      {[...Array(6)].map((_, i) => (
+        <motion.span
+          key={i}
+          className="sparkle"
+          style={{ left: `${10 + i * 15}%`, top: `${20 + (i % 3) * 15}%` }}
+          animate={{ scale: [0.5, 1.2, 0.5], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.15 }}
+        >
+          ✦
+        </motion.span>
+      ))}
+    </div>
+  </div>
+);
+
+const WeddingDecor = () => (
+  <div className="event-decor wedding-decor">
+    {/* Floating hearts */}
+    {['❤️', '💕', '💗', '💖', '💝'].map((heart, i) => (
+      <motion.div
+        key={i}
+        className="floating-heart"
+        style={{ left: `${5 + i * 20}%` }}
+        animate={{ y: [0, -12, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }}
+      >
+        {heart}
+      </motion.div>
+    ))}
+    {/* Sacred fire/mandap flames */}
+    <div className="mandap-flames">
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="flame"
+          animate={{ y: [0, -5, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 0.5 + i * 0.1, repeat: Infinity, ease: "easeInOut" }}
+        >
+          🔥
+        </motion.div>
+      ))}
+    </div>
+    {/* Wedding bells */}
+    <motion.div
+      className="wedding-bells"
+      animate={{ rotate: [-10, 10, -10] }}
+      transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+    >
+      🔔
+    </motion.div>
+    {/* Garland decoration */}
+    <svg className="decor-svg garland-svg" viewBox="0 0 120 25" width="120" height="25">
+      <path d="M5 12 Q30 22 60 12 Q90 2 115 12" fill="none" stroke="#d4af37" strokeWidth="3" opacity="0.6"/>
+      {[15, 40, 60, 80, 105].map((x, i) => (
+        <circle key={i} cx={x} cy={i % 2 === 0 ? 14 : 10} r="4" fill={['#ff6b35', '#ff1493', '#ffd700'][i % 3]} opacity="0.7"/>
+      ))}
+    </svg>
+  </div>
+);
+
+// Get decoration component based on event name
+const getEventDecor = (eventName: string) => {
+  switch (eventName) {
+    case 'Mehendi': return <MehendiDecor />;
+    case 'Sangeet': return <SangeetDecor />;
+    case 'Haldi': return <HaldiDecor />;
+    case 'Wedding': return <WeddingDecor />;
+    default: return null;
+  }
+};
 
 const EVENTS = [
   {
@@ -13,28 +186,49 @@ const EVENTS = [
     subtitle: 'The Art of Love',
     description: 'Join us for the beautiful tradition of Mehendi, where intricate henna designs tell stories of love and celebration.',
     color: '#ff6b35',
-    icon: '🎨'
+    icon: '🎨',
+    schedule: [
+      { time: '4:00 PM', activity: 'Welcome & Refreshments', icon: '🍹' },
+      { time: '5:00 PM', activity: 'Mehendi Application Begins', icon: '✋' },
+      { time: '7:00 PM', activity: 'Music & Entertainment', icon: '🎵' },
+    ]
   },
   {
     name: 'Sangeet',
     subtitle: 'Dance & Celebration',
     description: 'A night of music, dance, and joy as families come together to celebrate with traditional performances.',
     color: '#ff69b4',
-    icon: '💃'
+    icon: '💃',
+    schedule: [
+      { time: '6:00 PM', activity: 'Cocktails & Mingling', icon: '🍸' },
+      { time: '7:30 PM', activity: 'Family Performances', icon: '🎤' },
+      { time: '9:00 PM', activity: 'DJ & Dance Floor', icon: '🎧' },
+    ]
   },
   {
     name: 'Haldi',
     subtitle: 'Golden Blessings',
     description: 'The sacred turmeric ceremony where blessings are showered upon the couple for a prosperous life ahead.',
     color: '#ffd700',
-    icon: '✨'
+    icon: '✨',
+    schedule: [
+      { time: '10:00 AM', activity: 'Traditional Pooja', icon: '🪔' },
+      { time: '11:00 AM', activity: 'Haldi Ceremony', icon: '💛' },
+      { time: '1:00 PM', activity: 'Lunch & Celebration', icon: '🍽️' },
+    ]
   },
   {
     name: 'Wedding',
     subtitle: 'Two Souls, One Journey',
     description: 'The moment when two hearts become one, surrounded by love, blessings, and eternal promises.',
     color: '#d4af37',
-    icon: '💍'
+    icon: '💍',
+    schedule: [
+      { time: '6:00 PM', activity: 'Baraat Arrival', icon: '🐴' },
+      { time: '7:00 PM', activity: 'Jaimala Ceremony', icon: '💐' },
+      { time: '8:30 PM', activity: 'Pheras & Vows', icon: '🔥' },
+      { time: '10:00 PM', activity: 'Vidaai & Reception', icon: '🎊' },
+    ]
   }
 ];
 
@@ -42,6 +236,7 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -55,6 +250,20 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
   const handleSectionClick = (sectionName: string) => {
     setCurrentSection(currentSection === sectionName ? null : sectionName);
   };
+
+  // Scroll to section when animation completes
+  const scrollToSection = useCallback((sectionName: string) => {
+    const sectionEl = sectionRefs.current[sectionName];
+    if (sectionEl) {
+      // Small delay to ensure content is fully rendered
+      setTimeout(() => {
+        sectionEl.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center'
+        });
+      }, 100);
+    }
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] overflow-hidden">
@@ -156,10 +365,106 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="section-content"
+                          className={`section-content section-${event.name.toLowerCase()}`}
+                          onAnimationComplete={(definition) => {
+                            // Only scroll when opening (not closing)
+                            if (definition === 'animate' || (typeof definition === 'object' && 'opacity' in definition && definition.opacity === 1)) {
+                              scrollToSection(event.name);
+                            }
+                          }}
                         >
-                          <div className="event-details">
+                          <div 
+                            className="event-details"
+                            ref={(el) => { sectionRefs.current[event.name] = el; }}
+                          >
+                            {/* Themed Decorations */}
+                            {getEventDecor(event.name)}
+                            
                             <p className="event-description">{event.description}</p>
+                            
+                            {/* Event Schedule List */}
+                            <div className="event-schedule">
+                              <h4 className="schedule-title" style={{ color: event.color }}>
+                                📅 Event Schedule
+                              </h4>
+                              <ul className="schedule-list">
+                                {event.schedule.map((item, idx) => (
+                                  <motion.li
+                                    key={idx}
+                                    className="schedule-item"
+                                    initial={{ 
+                                      x: -30, 
+                                      opacity: 0, 
+                                      scale: 0.9,
+                                      filter: 'blur(4px)'
+                                    }}
+                                    animate={{ 
+                                      x: 0, 
+                                      opacity: 1, 
+                                      scale: 1,
+                                      filter: 'blur(0px)'
+                                    }}
+                                    transition={{ 
+                                      delay: idx * 0.15,
+                                      duration: 0.5,
+                                      ease: [0.25, 0.46, 0.45, 0.94],
+                                      scale: { type: "spring", stiffness: 200, damping: 15 }
+                                    }}
+                                    whileHover={{ 
+                                      scale: 1.02, 
+                                      x: 8,
+                                      boxShadow: `0 8px 25px rgba(0, 0, 0, 0.15), 0 0 15px ${event.color}30`,
+                                      transition: { duration: 0.2 }
+                                    }}
+                                    whileTap={{ scale: 0.98 }}
+                                    style={{ 
+                                      borderLeftColor: event.color,
+                                      '--item-color': event.color 
+                                    } as React.CSSProperties}
+                                  >
+                                    <motion.span 
+                                      className="schedule-icon"
+                                      initial={{ rotate: -10, scale: 0 }}
+                                      animate={{ rotate: 0, scale: 1 }}
+                                      transition={{ 
+                                        delay: idx * 0.15 + 0.2,
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 10
+                                      }}
+                                    >
+                                      {item.icon}
+                                    </motion.span>
+                                    <motion.span 
+                                      className="schedule-time" 
+                                      style={{ color: event.color }}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ delay: idx * 0.15 + 0.1 }}
+                                    >
+                                      {item.time}
+                                    </motion.span>
+                                    <motion.span 
+                                      className="schedule-divider"
+                                      initial={{ scaleX: 0 }}
+                                      animate={{ scaleX: 1 }}
+                                      transition={{ delay: idx * 0.15 + 0.25, duration: 0.3 }}
+                                    >
+                                      —
+                                    </motion.span>
+                                    <motion.span 
+                                      className="schedule-activity"
+                                      initial={{ opacity: 0, x: 10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: idx * 0.15 + 0.2, duration: 0.4 }}
+                                    >
+                                      {item.activity}
+                                    </motion.span>
+                                  </motion.li>
+                                ))}
+                              </ul>
+                            </div>
+                            
                             <div
                               className="event-accent"
                               style={{ backgroundColor: event.color }}

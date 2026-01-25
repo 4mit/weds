@@ -28,7 +28,7 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
   const [isLandscape, setIsLandscape] = useState(false);
 
   // Speed configuration
-  const SPEED = isMobile ? 16 : 12; // pixels per frame
+  const SPEED = isMobile ? 16 : 45; // pixels per frame
   const EASE = 1; // smoothing factor (0-1, lower = smoother)
 
   useEffect(() => {

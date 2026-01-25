@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import CountdownScreen from '@/components/CountdownScreen';
 import StartScreen from '@/components/StartScreen';
 import ParallaxEngine from '@/components/ParallaxEngine';
 import ProgressBar from '@/components/ProgressBar';
@@ -27,6 +28,9 @@ import SoundManager from '@/components/SoundManager';
 import Fireworks from '@/components/Fireworks';
 import WeddingLights from '@/components/WeddingLights';
 
+// Wedding date - February 21, 2026
+const WEDDING_DATE = new Date('2026-02-21T00:00:00');
+
 // World configuration - responsive (shorter journey on mobile for better UX)
 const getWorldWidth = (isMobile: boolean) => isMobile ? 6000 : 12000;
 
@@ -42,6 +46,7 @@ const SECTIONS = [
 ];
 
 export default function WeddingJourney() {
+  const [showCountdown, setShowCountdown] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -51,6 +56,10 @@ export default function WeddingJourney() {
   const [facingDirection, setFacingDirection] = useState<'left' | 'right' | 'idle'>('right');
   const [score, setScore] = useState(0);
   const crossedSectionsRef = useRef<Set<string>>(new Set());
+
+  const handleCountdownComplete = useCallback(() => {
+    setShowCountdown(false);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => window.innerWidth < 768;
@@ -154,6 +163,12 @@ export default function WeddingJourney() {
   const bridePosition = isMobile ? 0.85 : 0.904;
   const isHugging = progress >= bridePosition && !reachedEnd;
 
+  // Show countdown screen first
+  if (showCountdown) {
+    return <CountdownScreen onComplete={handleCountdownComplete} weddingDate={WEDDING_DATE} />;
+  }
+
+  // Then show start screen
   if (!gameStarted) {
     return <StartScreen onStart={handleStart} />;
   }
