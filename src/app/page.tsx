@@ -26,6 +26,7 @@ import {
   SatyanarayanKathaScene,
   DancingCelebrationScene,
   GroomHome,
+  FinaleHome,
   ArrowSignboard,
 } from '@/components/WeddingScenes';
 import DiscoLights from '@/components/DiscoLights';
@@ -164,6 +165,7 @@ export default function WeddingJourney() {
   const [facingDirection, setFacingDirection] = useState<'left' | 'right' | 'idle'>('right');
   const [score, setScore] = useState(0);
   const crossedSectionsRef = useRef<Set<string>>(new Set());
+  const [showHeadphonePopup, setShowHeadphonePopup] = useState(false);
 
   const handleCountdownComplete = useCallback(() => {
     setShowCountdown(false);
@@ -191,10 +193,22 @@ export default function WeddingJourney() {
 
   const handleStart = useCallback(() => {
     setGameStarted(true);
+    // Show headphone popup when journey starts
+    setShowHeadphonePopup(true);
     // Reset score and crossed sections when starting
     setScore(0);
     crossedSectionsRef.current.clear();
   }, []);
+
+  // Hide headphone popup after 2.5 seconds
+  useEffect(() => {
+    if (showHeadphonePopup) {
+      const timer = setTimeout(() => {
+        setShowHeadphonePopup(false);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showHeadphonePopup]);
 
   const handleProgress = useCallback((p: number) => {
     setProgress(p);
@@ -508,6 +522,61 @@ export default function WeddingJourney() {
           >
             <GroomHome x={0} />
           </div>
+
+          {/* Headphone Popup - Flashing message over GroomHome section */}
+          <AnimatePresence>
+            {showHeadphonePopup && gameStarted && (
+              <motion.div
+                className="fixed top-[40%] left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+                initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                animate={{ 
+                  opacity: [0.7, 1, 0.7, 1, 0.7, 1],
+                  scale: [0.95, 1, 0.95, 1, 0.95, 1],
+                }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                transition={{ 
+                  duration: 2.5,
+                  times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+                  ease: "easeInOut"
+                }}
+              >
+                <div className="bg-gradient-to-br from-[#800020] via-[#a00030] to-[#800020] border-2 border-[#d4af37] rounded-2xl px-6 py-4 sm:px-8 sm:py-5 shadow-2xl backdrop-blur-sm">
+                  <div className="flex flex-col items-center gap-3">
+                    {/* Headphone icon */}
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, -5, 0]
+                      }}
+                      transition={{ 
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="text-4xl sm:text-5xl"
+                    >
+                      🎧
+                    </motion.div>
+                    {/* Message */}
+                    <div className="text-center">
+                      <p 
+                        className="text-[#d4af37] font-bold text-base sm:text-lg md:text-xl mb-1"
+                        style={{ fontFamily: 'Playfair Display, serif' }}
+                      >
+                        Use Headphones
+                      </p>
+                      <p 
+                        className="text-[#f4e4bc] text-sm sm:text-base"
+                        style={{ fontFamily: 'Poppins, sans-serif' }}
+                      >
+                        for Better Experience
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Welcome people at start - positioned between GroomHome and WelcomeGate */}
           <div 
@@ -573,7 +642,7 @@ export default function WeddingJourney() {
               transform: isMobile ? 'scale(0.5)' : 'scale(1)'
             }}
           >
-            <WelcomeGate x={0} title="Som Family" />
+            <WelcomeGate x={0} title="Soni Family" />
           </div>
 
           {/* Render all event sections dynamically */}
@@ -693,82 +762,51 @@ export default function WeddingJourney() {
           })}
 
           {/* ===== FINALE SECTION ===== */}
-          <ArrowSignboard x={isMobile ? 9500 : 19000} eventName="Home" direction="right" />
-          {/* Home Banner - spaced from house with larger gap */}
-          <EventBanner 
-            x={isMobile ? 9600 : 19200} 
-            title="Welcome Home" 
-            subtitle="Happily Ever After" 
-            isActive={progress >= 0.92 && progress <= 0.98}
-          />
-          <div 
-            className="absolute bottom-[15%]"
-            style={{ left: isMobile ? 10200 : 20400 }}
-          >
-            {/* Beautiful decorated home */}
-            <svg width={isMobile ? 200 : 400} height={isMobile ? 200 : 380} viewBox="0 0 400 380">
-              {/* Ground */}
-              <ellipse cx="200" cy="370" rx="190" ry="15" fill="#228b22" opacity="0.3" />
-              
-              {/* Main House */}
-              <rect x="50" y="120" width="300" height="250" fill="#fff8dc" stroke="#8b4513" strokeWidth="4" />
-              
-              {/* Roof */}
-              <path d="M30 120 L200 30 L370 120 Z" fill="#8b0000" stroke="#d4af37" strokeWidth="3" />
-              <path d="M50 120 L200 50 L350 120 Z" fill="#a52a2a" />
-              
-              {/* Kalash on roof */}
-              <g transform="translate(200, 20)">
-                <ellipse cx="0" cy="15" rx="8" ry="4" fill="#cd7f32" />
-                <path d="M-6 15 Q-8 5 0 0 Q8 5 6 15" fill="#daa520" />
-                <ellipse cx="0" cy="0" rx="4" ry="3" fill="#8b4513" />
-              </g>
-              
-              {/* Windows with warm light */}
-              <rect x="70" y="150" width="60" height="80" fill="#ffd700" stroke="#8b4513" strokeWidth="3" opacity="0.8" />
-              <line x1="100" y1="150" x2="100" y2="230" stroke="#8b4513" strokeWidth="2" />
-              <line x1="70" y1="190" x2="130" y2="190" stroke="#8b4513" strokeWidth="2" />
-              
-              <rect x="270" y="150" width="60" height="80" fill="#ffd700" stroke="#8b4513" strokeWidth="3" opacity="0.8" />
-              <line x1="300" y1="150" x2="300" y2="230" stroke="#8b4513" strokeWidth="2" />
-              <line x1="270" y1="190" x2="330" y2="190" stroke="#8b4513" strokeWidth="2" />
-              
-              {/* Main Door */}
-              <rect x="150" y="220" width="100" height="150" fill="#4a2c2a" stroke="#d4af37" strokeWidth="4" />
-              <path d="M150 220 Q200 180 250 220" fill="#8b0000" stroke="#d4af37" strokeWidth="3" />
-              <line x1="200" y1="220" x2="200" y2="370" stroke="#d4af37" strokeWidth="3" />
-              <circle cx="180" cy="300" r="6" fill="#d4af37" />
-              <circle cx="220" cy="300" r="6" fill="#d4af37" />
-              
-              {/* Toran (door hanging) */}
-              <path d="M145 218 Q200 240 255 218" fill="none" stroke="#ff6b35" strokeWidth="8" />
-              <path d="M145 218 Q200 250 255 218" fill="none" stroke="#228b22" strokeWidth="5" />
-              
-              {/* Decorative lights */}
-              {[60, 100, 140, 260, 300, 340].map((lx, i) => (
-                <circle key={i} cx={lx} cy="125" r="6" fill={['#ff0000', '#ffd700', '#00ff00'][i % 3]} className="glow" />
-              ))}
-              
-              {/* Welcome banner */}
-              <rect x="120" y="90" width="160" height="25" fill="#800020" rx="3" stroke="#d4af37" strokeWidth="2" />
-              <text x="200" y="108" textAnchor="middle" fill="#d4af37" fontSize="14" fontWeight="bold">WELCOME HOME</text>
-              
-              {/* Diyas */}
-              <circle cx="130" cy="365" r="8" fill="#cd853f" />
-              <path d="M130 357 Q135 350 133 343 Q130 338 127 343 Q125 350 130 357" fill="#ff6b00" className="flame" />
-              <circle cx="270" cy="365" r="8" fill="#cd853f" />
-              <path d="M270 357 Q275 350 273 343 Q270 338 267 343 Q265 350 270 357" fill="#ff6b00" className="flame" />
-              
-              {/* Rangoli */}
-              <circle cx="200" cy="385" r="25" fill="none" stroke="#ff6b35" strokeWidth="3" />
-              <circle cx="200" cy="385" r="15" fill="none" stroke="#ff1493" strokeWidth="2" />
-              <circle cx="200" cy="385" r="8" fill="#ffd700" />
-            </svg>
-          </div>
+          {/* Calculate Finale position: 0.95 of world width */}
+          {(() => {
+            const finaleBaseX = 0.95 * worldWidth;
+            const arrowOffset = isMobile ? -200 : -400;
+            const bannerOffset = isMobile ? 100 : 200;
+            // Position house directly below/after the banner
+            // Account for building width (600px * scale) to ensure it's fully visible
+            // Mobile: building scaled to 0.7 = 420px wide, so position at 9500 + 100 + 200 = 9800 (leaves 200px margin)
+            // Desktop: building scaled to 0.9 = 540px wide, so position at 19000 + 200 + 300 = 19500 (leaves 500px margin)
+            const houseOffset = isMobile ? 200 : 300;
+            
+            return (
+              <>
+                <ArrowSignboard x={finaleBaseX + arrowOffset} eventName="Home" direction="right" />
+                {/* Home Banner - spaced from house */}
+                <EventBanner 
+                  x={finaleBaseX + bannerOffset} 
+                  title="Welcome Home" 
+                  subtitle="Happily Ever After" 
+                  isActive={progress >= 0.92 && progress <= 0.98}
+                />
+                {/* Welcome Home Building - using FinaleHome component */}
+                {/* Position it so it's visible on screen - ensure it doesn't go beyond world width */}
+                <div 
+                  className="absolute bottom-[12%] origin-bottom-left z-50"
+                  style={{ 
+                    left: Math.min(finaleBaseX + bannerOffset + houseOffset, worldWidth - (isMobile ? 450 : 600)),
+                    transform: isMobile ? 'scale(0.7)' : 'scale(0.9)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <FinaleHome x={0} />
+                </div>
+              </>
+            );
+          })()}
 
-          {/* Family members welcoming */}
+          {/* Family members welcoming - positioned relative to Finale */}
+          {(() => {
+            const finaleBaseX = 0.95 * worldWidth;
+            const familyOffset = isMobile ? -4750 : -8800; // Position before the house
+            return (
+              <>
           {/* Mother with aarti */}
-          <div className="absolute bottom-[15%]" style={{ left: isMobile ? 4750 : 10200 }}>
+          <div className="absolute bottom-[15%]" style={{ left: finaleBaseX + familyOffset + (isMobile ? 0 : 200) }}>
             <svg width={isMobile ? 35 : 60} height={isMobile ? 55 : 90} viewBox="0 0 60 90">
               <path d="M15 40 Q10 60 18 85 L42 85 Q50 60 45 40 Z" fill="#ff1493" />
               <rect x="20" y="30" width="20" height="15" fill="#ff1493" rx="3" />
@@ -781,7 +819,7 @@ export default function WeddingJourney() {
           </div>
 
           {/* Father */}
-          <div className="absolute bottom-[15%]" style={{ left: isMobile ? 4780 : 10260 }}>
+          <div className="absolute bottom-[15%]" style={{ left: finaleBaseX + familyOffset + (isMobile ? 30 : 260) }}>
             <svg width={isMobile ? 30 : 55} height={isMobile ? 50 : 85} viewBox="0 0 55 85">
               <ellipse cx="27" cy="75" rx="22" ry="8" fill="#f5f5dc" />
               <rect x="12" y="35" width="30" height="30" fill="#f5f5dc" rx="3" />
@@ -792,7 +830,7 @@ export default function WeddingJourney() {
           </div>
 
           {/* Grandmother with flowers */}
-          <div className="absolute bottom-[15%]" style={{ left: isMobile ? 5020 : 10720 }}>
+          <div className="absolute bottom-[15%]" style={{ left: finaleBaseX + familyOffset + (isMobile ? 270 : 920) }}>
             <svg width={isMobile ? 30 : 50} height={isMobile ? 50 : 80} viewBox="0 0 50 80">
               <path d="M12 38 Q8 55 15 75 L35 75 Q42 55 38 38 Z" fill="#006400" />
               <rect x="15" y="28" width="20" height="14" fill="#006400" rx="2" />
@@ -806,7 +844,7 @@ export default function WeddingJourney() {
           </div>
 
           {/* Young boy with sparkler */}
-          <div className="absolute bottom-[15%]" style={{ left: isMobile ? 5050 : 10780 }}>
+          <div className="absolute bottom-[15%]" style={{ left: finaleBaseX + familyOffset + (isMobile ? 300 : 980) }}>
             <svg width={isMobile ? 30 : 45} height={isMobile ? 45 : 70} viewBox="0 0 45 70">
               <rect x="12" y="28" width="18" height="22" fill="#4169e1" rx="3" />
               <rect x="14" y="48" width="6" height="14" fill="#1a1a1a" rx="2" />
@@ -820,7 +858,7 @@ export default function WeddingJourney() {
           </div>
 
           {/* Young girl throwing petals */}
-          <div className="absolute bottom-[15%]" style={{ left: isMobile ? 4720 : 10150 }}>
+          <div className="absolute bottom-[15%]" style={{ left: finaleBaseX + familyOffset + (isMobile ? -30 : 150) }}>
             <svg width={isMobile ? 28 : 45} height={isMobile ? 45 : 70} viewBox="0 0 45 70">
               <path d="M10 35 Q5 50 12 65 L33 65 Q40 50 35 35 Z" fill="#ff69b4" />
               <rect x="15" y="25" width="15" height="12" fill="#ff69b4" rx="2" />
@@ -831,16 +869,27 @@ export default function WeddingJourney() {
               <circle cx="22" cy="12" r="1.5" fill="#ff0000" />
             </svg>
           </div>
-          
+              </>
+            );
+          })()}
+
           {/* Bride waiting at Welcome Home - visible when hugging */}
-          <div 
-            className="absolute bottom-[8%] sm:bottom-[6%] md:bottom-[6%]" 
-            style={{ 
-              left: isMobile ? 10200 : 20400
-            }}
-          >
-            <Bride isMoving={false} scale={isMobile ? 0.5 : 1.2} />
-          </div>
+          {(() => {
+            const finaleBaseX = 0.95 * worldWidth;
+            const bannerOffset = isMobile ? 100 : 200;
+            const houseOffset = isMobile ? 500 : 600;
+            const brideOffset = bannerOffset + houseOffset + (isMobile ? 200 : 400);
+            return (
+              <div 
+                className="absolute bottom-[8%] sm:bottom-[6%] md:bottom-[6%] z-35" 
+                style={{ 
+                  left: finaleBaseX + brideOffset
+                }}
+              >
+                <Bride isMoving={false} scale={isMobile ? 0.5 : 1.2} />
+              </div>
+            );
+          })()}
 
           {/* ===== FIREWORKS & ROCKETS ===== */}
           {/* Firework bursts in the sky */}

@@ -151,14 +151,14 @@ const WeddingLights: React.FC<WeddingLightsProps> = ({ x, width, isActive }) => 
         />
       ))}
 
-      {/* Floating sparkles */}
+      {/* Floating sparkles - centered on screen */}
       {Array.from({ length: 15 }).map((_, i) => (
         <div
           key={i}
           className="absolute sparkle-burst"
           style={{
             left: `${(i * 7) % 100}%`,
-            top: `${20 + (i * 13) % 50}%`,
+            top: `${35 + (i * 8) % 30}%`, // Centered around 35-65% (middle of screen)
             '--delay': `${(i * 0.2) % 2}s`,
           } as React.CSSProperties}
         >

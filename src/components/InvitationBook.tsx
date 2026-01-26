@@ -180,7 +180,7 @@ const getEventDecor = (eventName: string) => {
     case 'Barat': return <WeddingDecor />;
     case 'Sadi': return <WeddingDecor />;
     case 'Reception': return <SangeetDecor />;
-    case 'Satyanarayan Katha Puja': return <HaldiDecor />;
+    case 'Satyanarayan Puja': return <HaldiDecor />;
     default: return null;
   }
 };

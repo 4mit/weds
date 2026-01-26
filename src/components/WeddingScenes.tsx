@@ -2060,7 +2060,7 @@ export const GroomHome: React.FC<{ x: number }> = ({ x }) => (
 
 // Finale Home with Welcoming Family
 export const FinaleHome: React.FC<{ x: number }> = ({ x }) => (
-  <div className={x === 0 ? "relative" : "absolute bottom-[10%]"} style={x !== 0 ? { left: x } : undefined}>
+  <div className={x === 0 ? "relative" : "absolute bottom-[12%]"} style={x !== 0 ? { left: x, zIndex: 50 } : undefined}>
     <div className="relative w-[600px] h-[400px]">
       {/* Beautiful Home */}
       <svg className="absolute" width="400" height="380" viewBox="0 0 400 380" style={{ left: 100 }}>
