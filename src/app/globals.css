@@ -403,12 +403,76 @@ body {
   font-size: 2rem;
   color: #d4af37;
   font-weight: bold;
-  width: 30px;
-  height: 30px;
+  min-width: 30px;
+  width: auto;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 0.5rem;
+}
+
+.view-detail-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #d4af37;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6), 0 0 12px rgba(212, 175, 55, 0.4);
+  animation: flashViewDetail 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.8));
+}
+
+@keyframes flashViewDetail {
+  0%, 100% {
+    opacity: 1;
+    color: #d4af37;
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.6), 0 0 12px rgba(212, 175, 55, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 0 0 16px rgba(255, 215, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.4);
+    transform: scale(1.05);
+  }
+}
+
+/* Responsive adjustments for View Detail text */
+@media (max-width: 640px) {
+  .view-detail-text {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 6px rgba(212, 175, 55, 0.7), 0 0 10px rgba(212, 175, 55, 0.5);
+  }
+  
+  .section-toggle {
+    padding: 0.3rem;
+    min-width: 25px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .view-detail-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (min-width: 1025px) {
+  .view-detail-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6), 0 0 14px rgba(212, 175, 55, 0.4), 0 0 18px rgba(212, 175, 55, 0.2);
+  }
 }
 
 .section-content {

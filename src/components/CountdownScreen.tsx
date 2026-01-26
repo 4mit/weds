@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CountdownScreenProps {
   onComplete: () => void;
@@ -15,9 +15,16 @@ interface TimeLeft {
   seconds: number;
 }
 
+// Couples data - defined outside component
+const couples = [
+  { groom: 'Amit', bride: 'Ranjana' },
+  { groom: 'Laxminarayan', bride: 'Pratima' }
+];
+
 const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDate }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [mounted, setMounted] = useState(false);
+  const [currentCoupleIndex, setCurrentCoupleIndex] = useState(0);
 
   const calculateTimeLeft = useCallback((): TimeLeft => {
     const now = new Date().getTime();
@@ -46,6 +53,17 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
 
     return () => clearInterval(timer);
   }, [calculateTimeLeft]);
+
+  // Auto-transition between couples
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const interval = setInterval(() => {
+      setCurrentCoupleIndex((prev) => (prev + 1) % couples.length);
+    }, 3000); // Change couple every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [mounted]);
 
   if (!mounted) {
     return null;
@@ -118,30 +136,145 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
 
       {/* Main content */}
       <div className="relative z-20 flex flex-col items-center justify-center px-4 text-center">
-        {/* Couple names */}
-        <motion.div
-          className="flex items-center gap-3 mb-6"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          style={{
-            fontFamily: "'Dancing Script', cursive",
-            fontSize: 'clamp(1.8rem, 5vw, 2.5rem)',
-            fontWeight: 700,
-            color: '#1a1a1a',
-            textShadow: '2px 2px 0 rgba(255, 255, 255, 0.5)'
+        {/* Couple names with transition - Fancy Highlighted */}
+        <div 
+          className="mb-4 sm:mb-6 w-full flex justify-center" 
+          style={{ 
+            minHeight: 'clamp(60px, 10vw, 90px)',
+            position: 'relative',
+            padding: '0 1rem'
           }}
         >
-          <span>Amit</span>
-          <motion.span 
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))' }}
-          >
-            💕
-          </motion.span>
-          <span>Ranjana</span>
-        </motion.div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={currentCoupleIndex}
+              className="flex items-center justify-center flex-wrap gap-2 sm:gap-3"
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              style={{
+                position: 'relative',
+                textAlign: 'center',
+                maxWidth: '100%',
+              }}
+            >
+              {/* Groom name - fancy highlighted */}
+              <motion.span 
+                style={{ 
+                  whiteSpace: 'nowrap',
+                  fontFamily: "'Dancing Script', cursive",
+                  fontSize: 'clamp(2.5rem, 1.5rem, 4.5rem)',
+                  fontWeight: 800,
+                  color: '#ff6b35',
+                  textShadow: `
+                    2px 2px 0px rgba(0, 0, 0, 0.8),
+                    0 0 20px rgba(22, 12, 8, 0.9),
+                    0 0 30px rgba(15, 13, 2, 0.7),
+                    0 0 40px rgba(27, 26, 25, 0.5),
+                    -1px -1px 0px rgba(255, 255, 255, 0.3)
+                  `,
+                  filter: 'drop-shadow(3px 3px 6px rgba(29, 4, 4, 0.5))',
+                  position: 'relative',
+                }}
+                animate={{
+                  textShadow: [
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 53, 0.9), 0 0 30px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 140, 0, 0.5), -1px -1px 0px rgba(255, 255, 255, 0.3)',
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 107, 53, 1), 0 0 40px rgba(255, 215, 0, 0.9), 0 0 50px rgba(255, 140, 0, 0.7), -1px -1px 0px rgba(255, 255, 255, 0.4)',
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 53, 0.9), 0 0 30px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 140, 0, 0.5), -1px -1px 0px rgba(255, 255, 255, 0.3)',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                {couples[currentCoupleIndex].groom}
+              </motion.span>
+              
+              {/* Heart icon - enhanced */}
+              <motion.span 
+                animate={{ 
+                  scale: [1, 1.3, 1], 
+                  rotate: [0, 15, -15, 0],
+                }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                style={{ 
+                  filter: 'drop-shadow(0 0 10px rgba(255, 20, 147, 0.8)) drop-shadow(0 0 20px rgba(255, 105, 180, 0.6))',
+                  fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
+                  display: 'inline-block',
+                  flexShrink: 0,
+                  textShadow: '0 0 15px rgba(255, 20, 147, 0.9)',
+                }}
+              >
+                💕
+              </motion.span>
+              
+              {/* Bride name - fancy highlighted */}
+              <motion.span 
+                style={{ 
+                  whiteSpace: 'nowrap',
+                  fontFamily: "'Dancing Script', cursive",
+                  fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                  fontWeight: 800,
+                  color: '#ff1493',
+                  textShadow: `
+                    2px 2px 0px rgba(0, 0, 0, 0.8),
+                    0 0 20px rgba(255, 20, 147, 0.9),
+                    0 0 30px rgba(255, 105, 180, 0.7),
+                    0 0 40px rgba(255, 182, 193, 0.5),
+                    -1px -1px 0px rgba(255, 255, 255, 0.3)
+                  `,
+                  filter: 'drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5))',
+                  position: 'relative',
+                }}
+                animate={{
+                  textShadow: [
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 20, 147, 0.9), 0 0 30px rgba(255, 105, 180, 0.7), 0 0 40px rgba(255, 182, 193, 0.5), -1px -1px 0px rgba(255, 255, 255, 0.3)',
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 20, 147, 1), 0 0 40px rgba(255, 105, 180, 0.9), 0 0 50px rgba(255, 182, 193, 0.7), -1px -1px 0px rgba(255, 255, 255, 0.4)',
+                    '2px 2px 0px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 20, 147, 0.9), 0 0 30px rgba(255, 105, 180, 0.7), 0 0 40px rgba(255, 182, 193, 0.5), -1px -1px 0px rgba(255, 255, 255, 0.3)',
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 0.5,
+                }}
+              >
+                {couples[currentCoupleIndex].bride}
+              </motion.span>
+              
+              {/* Decorative sparkles */}
+              {Array.from({ length: 6 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute"
+                  style={{
+                    width: '4px',
+                    height: '4px',
+                    background: '#ffd700',
+                    borderRadius: '50%',
+                    left: `${15 + i * 15}%`,
+                    top: i % 2 === 0 ? '10%' : '85%',
+                    boxShadow: '0 0 8px #ffd700, 0 0 12px #ffd700',
+                  }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: 'easeInOut',
+                  }}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {/* Main countdown display */}
         <motion.div

@@ -16,33 +16,141 @@ import {
   WelcomeGate,
   EventBanner,
   MehendiScene,
-  SangeetScene,
+  ChurmatiScene,
   HaldiScene,
+  SangeetScene,
+  EngagementScene,
+  BaratScene,
   WeddingMandap,
+  ReceptionScene,
+  SatyanarayanKathaScene,
   DancingCelebrationScene,
   GroomHome,
   ArrowSignboard,
 } from '@/components/WeddingScenes';
 import DiscoLights from '@/components/DiscoLights';
 import SoundManager from '@/components/SoundManager';
+import SangeetMusicManager from '@/components/SangeetMusicManager';
+import WeddingMusicManager from '@/components/WeddingMusicManager';
+import BaratMusicManager from '@/components/BaratMusicManager';
 import Fireworks from '@/components/Fireworks';
 import WeddingLights from '@/components/WeddingLights';
 
 // Wedding date - February 21, 2026
 const WEDDING_DATE = new Date('2026-02-21T00:00:00');
 
-// World configuration - responsive (shorter journey on mobile for better UX)
-const getWorldWidth = (isMobile: boolean) => isMobile ? 6000 : 12000;
+// World configuration - responsive (extended for all events)
+const getWorldWidth = (isMobile: boolean) => isMobile ? 10000 : 20000;
 
-// Section positions (as percentage of world width)
+// Event configuration matching invitation book exactly
+const EVENT_SECTIONS = [
+  { 
+    name: 'Mehendi', 
+    position: 0.08,
+    subtitle: 'The Art of Love',
+    scene: MehendiScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 2,
+  },
+  { 
+    name: 'Churmati', 
+    position: 0.18,
+    subtitle: 'Traditional Welcome',
+    scene: ChurmatiScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+  },
+  { 
+    name: 'Haldi', 
+    position: 0.28,
+    subtitle: 'Golden Blessings',
+    scene: HaldiScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+    hasSplashes: true,
+  },
+  { 
+    name: 'Sangeet', 
+    position: 0.38,
+    subtitle: 'Dance & Celebration',
+    scene: SangeetScene,
+    hasDiscoLights: true,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+  },
+  { 
+    name: 'Engagement', 
+    position: 0.48,
+    subtitle: 'The Promise',
+    scene: EngagementScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+  },
+  { 
+    name: 'Barat', 
+    position: 0.58,
+    subtitle: 'The Procession',
+    scene: BaratScene,
+    hasDiscoLights: true,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 0,
+  },
+  { 
+    name: 'Sadi', 
+    position: 0.68,
+    subtitle: 'The Wedding',
+    scene: WeddingMandap,
+    hasDiscoLights: false,
+    hasWeddingLights: true,
+    hasFireworks: true,
+    garlandCount: 2,
+    hasPetals: true,
+  },
+  { 
+    name: 'Reception', 
+    position: 0.78,
+    subtitle: 'Celebration',
+    scene: ReceptionScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+  },
+  { 
+    name: 'Satyanarayan Katha Puja', 
+    position: 0.88,
+    subtitle: 'Divine Blessings',
+    scene: SatyanarayanKathaScene,
+    hasDiscoLights: false,
+    hasWeddingLights: false,
+    hasFireworks: false,
+    garlandCount: 1,
+  },
+];
+
+// Section positions for progress tracking (must be defined after EVENT_SECTIONS)
 const SECTIONS = [
   { name: 'Start', position: 0 },
-  { name: 'Mehendi', position: 0.2 },
-  { name: 'Sangeet', position: 0.4 },
-  { name: 'Haldi', position: 0.6 },
-  { name: 'Wedding', position: 0.75 },
-  { name: 'Celebration', position: 0.88 },
-  { name: 'Finale', position: 1 },
+  { name: 'Mehendi', position: 0.08 },
+  { name: 'Churmati', position: 0.18 },
+  { name: 'Haldi', position: 0.28 },
+  { name: 'Sangeet', position: 0.38 },
+  { name: 'Engagement', position: 0.48 },
+  { name: 'Barat', position: 0.58 },
+  { name: 'Sadi', position: 0.68 },
+  { name: 'Reception', position: 0.78 },
+  { name: 'Satyanarayan Katha Puja', position: 0.88 },
+  { name: 'Finale', position: 0.95 },
 ];
 
 export default function WeddingJourney() {
@@ -52,7 +160,7 @@ export default function WeddingJourney() {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
   const [isMobile, setIsMobile] = useState(true); // Default to mobile-first
-  const [worldWidth, setWorldWidth] = useState(6000); // Default mobile width
+  const [worldWidth, setWorldWidth] = useState(10000); // Default mobile width (extended for all events)
   const [facingDirection, setFacingDirection] = useState<'left' | 'right' | 'idle'>('right');
   const [score, setScore] = useState(0);
   const crossedSectionsRef = useRef<Set<string>>(new Set());
@@ -157,11 +265,22 @@ export default function WeddingJourney() {
   // Calculate groom position on screen (stays roughly in center-left)
   const groomScreenX = isMobile ? '25%' : '30%';
   const reachedEnd = progress >= 0.98;
-  
-  // Detect when groom reaches bride (bride is at ~85% of world width)
-  // Mobile: 5100/6000 = 0.85, Desktop: 10850/12000 = 0.904
-  const bridePosition = isMobile ? 0.85 : 0.904;
+  // Bride is at Welcome Home section (Finale at 0.95)
+  // Mobile: 9900/10000 = 0.99, Desktop: 19800/20000 = 0.99
+  const bridePosition = 0.93;
   const isHugging = progress >= bridePosition && !reachedEnd;
+
+  // Detect when in Sangeet section (for music management and dancing)
+  // Sangeet is at position 0.38 (38%) - match SangeetMusicManager boundaries
+  const isInSangeetSection = progress >= 0.33 && progress <= 0.43;
+  
+  // Detect when in Barat section (for music management)
+  // Barat is at position 0.58 (58%) - match BaratMusicManager boundaries
+  const isInBaratSection = progress >= 0.56 && progress <= 0.63;
+  
+  // Detect when in Sadi/Wedding section (for music management)
+  // Sadi is at position 0.68 (68%) - match WeddingMusicManager boundaries
+  const isInWeddingSection = progress >= 0.63 && progress <= 0.73;
 
   // Show countdown screen first
   if (showCountdown) {
@@ -374,20 +493,26 @@ export default function WeddingJourney() {
           </div>
 
           {/* ===== STARTING AREA ===== */}
+          {/* Calculate positions accounting for scaled widths:
+              GroomHome: 350px width -> scaled 0.5 = 175px (mobile), scaled 1 = 350px (desktop)
+              WelcomeGate: 300px width -> scaled 0.5 = 150px (mobile), scaled 1 = 300px (desktop)
+              We want a large gap between them, so position gate much further right */}
+          
+          {/* GroomHome - positioned on the far left */}
           <div 
-            className="absolute bottom-[10%] origin-bottom-left"
+            className="absolute bottom-[15%] origin-bottom-left"
             style={{ 
-              left: isMobile ? 80 : 200,
+              left: isMobile ? '80px' : 0,
               transform: isMobile ? 'scale(0.5)' : 'scale(1)'
             }}
           >
             <GroomHome x={0} />
           </div>
           
-          {/* Welcome people at start */}
+          {/* Welcome people at start - positioned between GroomHome and WelcomeGate */}
           <div 
             className="absolute bottom-[18%] sm:bottom-[7%] md:bottom-[7%]" 
-            style={{ left: isMobile ? 260 : 400 }}
+            style={{ left: isMobile ? 300 : 500 }}
           >
             <div className="relative">
               {/* Welcoming family members */}
@@ -408,11 +533,11 @@ export default function WeddingJourney() {
             </div>
           </div>
 
-          {/* Wedding cars */}
+          {/* Wedding cars - positioned after the Welcome Gate */}
           <div 
             className="absolute bottom-[12%] origin-bottom-left"
             style={{ 
-              left: isMobile ? 350 : 600,
+              left: isMobile ? 600 : 1000,
               transform: isMobile ? 'scale(0.5)' : 'scale(1)'
             }}
           >
@@ -421,7 +546,7 @@ export default function WeddingJourney() {
           <div 
             className="absolute bottom-[12%] origin-bottom-left"
             style={{ 
-              left: isMobile ? 480 : 850,
+              left: isMobile ? 750 : 1200,
               transform: isMobile ? 'scale(0.5)' : 'scale(1)'
             }}
           >
@@ -429,191 +554,156 @@ export default function WeddingJourney() {
           </div>
 
           {/* Diyas along the path - fewer on mobile */}
-          {Array.from({ length: isMobile ? 25 : 60 }).map((_, i) => (
-            <Diya key={i} x={200 + i * (isMobile ? 180 : 200)} y={isMobile ? 60 : 80} scale={isMobile ? 0.5 : 0.8} />
+          {Array.from({ length: isMobile ? 50 : 100 }).map((_, i) => (
+            <Diya key={i} x={200 + i * (isMobile ? 200 : 200)} y={isMobile ? 60 : 80} scale={isMobile ? 0.5 : 0.8} />
           ))}
 
           {/* Rangolis along the path */}
-          {(isMobile ? [350, 1200, 2200, 3200, 4200, 5200] : [500, 2500, 4500, 6500, 8500, 10500]).map((rx, i) => (
+          {(isMobile ? [500, 1500, 2500, 3500, 4500, 5500, 6500, 7500, 8500, 9500] : [1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000, 17000, 19000]).map((rx, i) => (
             <Rangoli key={i} x={rx} y={isMobile ? 20 : 30} size={isMobile ? 60 : 100} />
           ))}
 
-          {/* ===== MEHENDI SECTION ===== */}
+          {/* Welcome Gate - positioned right after GroomHome at the start of journey
+              Mobile: GroomHome ends at ~255px (80px start + 175px width), Gate starts at 400px = ~145px gap
+              Desktop: GroomHome ends at ~350px (0px start + 350px width), Gate starts at 600px = ~250px gap */}
           <div 
             className="absolute bottom-[12%] origin-bottom-left"
             style={{ 
-              left: isMobile ? 317 : 1400,
+              left: isMobile ? 400 : 600,
               transform: isMobile ? 'scale(0.5)' : 'scale(1)'
             }}
           >
-            <WelcomeGate x={0} title="Soni Family" />
+            <WelcomeGate x={0} title="Som Family" />
           </div>
-          {/* Arrow signboard pointing to Mehendi */}
-          <ArrowSignboard x={isMobile ? 550 : 1300} eventName="Mehendi" direction="right" />
-          
-          <EventBanner 
-            x={isMobile ? 800 : 1800} 
-            title="Mehendi" 
-            subtitle="The Art of Love" 
-            isActive={progress >= 0.05 && progress <= 0.28}
-          />
-          <div 
-            className="absolute bottom-[15%] origin-bottom-left"
-            style={{ 
-              left: isMobile ? 850 : 2000,
-              transform: isMobile ? 'scale(0.4)' : 'scale(1)'
-            }}
-          >
-            <MehendiScene x={0} />
-          </div>
-          <Garland x={isMobile ? 800 : 1900} y={isMobile ? 50 : 80} width={isMobile ? 150 : 300} />
-          <Garland x={isMobile ? 1050 : 2300} y={isMobile ? 60 : 100} width={isMobile ? 120 : 250} />
 
-          {/* ===== SANGEET SECTION ===== */}
-          {/* Arrow signboard pointing to Sangeet */}
-          <ArrowSignboard x={isMobile ? 1250 : 3300} eventName="Sangeet" direction="right" />
-          
-          <EventBanner 
-            x={isMobile ? 1500 : 3800} 
-            title="Sangeet" 
-            subtitle="Dance & Celebration" 
-            isActive={progress >= 0.18 && progress <= 0.45}
-          />
-          <div 
-            className="absolute bottom-[15%] origin-bottom-left"
-            style={{ 
-              left: isMobile ? 1550 : 4000,
-              transform: isMobile ? 'scale(0.45)' : 'scale(1)'
-            }}
-          >
-            <SangeetScene x={0} />
-          </div>
-          <Garland x={isMobile ? 1500 : 3900} y={isMobile ? 45 : 70} width={isMobile ? 160 : 350} />
-          
-          {/* Disco lights effect - Full immersive experience */}
-          <DiscoLights x={isMobile ? 1400 : 3700} width={isMobile ? 350 : 800} isActive={progress >= 0.25 && progress <= 0.5} />
-
-          {/* ===== HALDI SECTION ===== */}
-          {/* Arrow signboard pointing to Haldi */}
-          <ArrowSignboard x={isMobile ? 2050 : 5300} eventName="Haldi" direction="right" />
-          
-          <EventBanner 
-            x={isMobile ? 2300 : 5800} 
-            title="Haldi" 
-            subtitle="Golden Blessings" 
-            isActive={progress >= 0.35 && progress <= 0.62}
-          />
-          <div 
-            className="absolute bottom-[15%] origin-bottom-left"
-            style={{ 
-              left: isMobile ? 2350 : 6000,
-              transform: isMobile ? 'scale(0.45)' : 'scale(1)'
-            }}
-          >
-            <HaldiScene x={0} />
-          </div>
-          <Garland x={isMobile ? 2300 : 5900} y={isMobile ? 55 : 90} width={isMobile ? 140 : 280} />
-          
-          {/* Yellow/turmeric splashes */}
-          {(isMobile ? [2400, 2470, 2550] : [6100, 6200, 6350]).map((hx, i) => (
-            <div
-              key={i}
-              className="absolute bottom-[20%] opacity-30"
-              style={{ left: hx }}
-            >
-              <div className={`${isMobile ? 'w-8 h-8' : 'w-16 h-16'} rounded-full bg-[#ffd700] blur-xl`} />
-            </div>
-          ))}
-
-          {/* ===== WEDDING SECTION ===== */}
-          {/* Arrow signboard pointing to Wedding */}
-          <ArrowSignboard x={isMobile ? 2850 : 7300} eventName="Wedding" direction="right" />
-          
-          <EventBanner 
-            x={isMobile ? 3100 : 7800} 
-            title="Wedding" 
-            subtitle="Two Souls, One Journey" 
-            isActive={progress >= 0.50 && progress <= 0.85}
-          />
-          <div 
-            className="absolute bottom-[10%] origin-bottom-left"
-            style={{ 
-              left: isMobile ? 3200 : 8200,
-              transform: isMobile ? 'scale(0.4)' : 'scale(1)'
-            }}
-          >
-            <WeddingMandap x={0} />
-          </div>
-          <Garland x={isMobile ? 3150 : 8100} y={isMobile ? 40 : 60} width={isMobile ? 180 : 400} />
-          <Garland x={isMobile ? 3400 : 8300} y={isMobile ? 50 : 80} width={isMobile ? 160 : 350} />
-          
-          {/* Flower petals near mandap */}
-          {Array.from({ length: isMobile ? 8 : 20 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute petal"
-              style={{
-                left: (isMobile ? 3250 : 8200) + (i % 5) * (isMobile ? 35 : 100),
-                top: '10%',
-                '--fall-duration': `${6 + (i % 4)}s`,
-                '--fall-delay': `${(i * 0.5) % 5}s`,
-              } as React.CSSProperties}
-            >
-              <span className={`text-pink-400 ${isMobile ? 'text-xs' : 'text-lg'}`}>🌸</span>
-            </div>
-          ))}
-
-          {/* Wedding Lights - String lights and decorative lighting */}
-          <WeddingLights 
-            x={isMobile ? 3050 : 7900} 
-            width={isMobile ? 500 : 900} 
-            isActive={progress >= 0.52 && progress <= 0.88}
-          />
-
-          {/* Fireworks for Wedding celebration */}
-          <Fireworks 
-            x={isMobile ? 3000 : 7800} 
-            width={isMobile ? 600 : 1000} 
-            isActive={progress >= 0.55 && progress <= 0.85}
-          />
-
-          {/* ===== DANCING CELEBRATION SECTION ===== */}
-          {/* Arrow signboard pointing to Celebration */}
-          <ArrowSignboard x={isMobile ? 3800 : 9000} eventName="Celebration" direction="right" />
-          
-          <EventBanner 
-            x={isMobile ? 4050 : 9500} 
-            title="Celebration" 
-            subtitle="Dance & Joy" 
-            isActive={progress >= 0.75 && progress <= 0.95}
-          />
-          <div 
-            className="absolute bottom-[15%] origin-bottom-left"
-            style={{ 
-              left: isMobile ? 4100 : 9700,
-              transform: isMobile ? 'scale(0.5)' : 'scale(1)'
-            }}
-          >
-            <DancingCelebrationScene x={0} />
-          </div>
-          <Garland x={isMobile ? 4000 : 9400} y={isMobile ? 40 : 60} width={isMobile ? 200 : 450} />
-          <Garland x={isMobile ? 4300 : 9600} y={isMobile ? 50 : 80} width={isMobile ? 180 : 400} />
-
-          {/* Additional disco lights for celebration */}
-          <DiscoLights 
-            x={isMobile ? 3900 : 9200} 
-            width={isMobile ? 500 : 1000} 
-            isActive={progress >= 0.78 && progress <= 0.92} 
-          />
+          {/* Render all event sections dynamically */}
+          {EVENT_SECTIONS.map((event, index) => {
+            const SceneComponent = event.scene;
+            const baseX = event.position * worldWidth;
+            const arrowOffset = isMobile ? -200 : -400;
+            const bannerOffset = isMobile ? 0 : 0;
+            const sceneOffset = isMobile ? 100 : 200;
+            const garlandSpacing = isMobile ? 150 : 300;
+            
+            // Calculate active range (8% before and after section position for better visibility)
+            const activeStart = Math.max(0, event.position - 0.08);
+            const activeEnd = Math.min(0.95, event.position + 0.08);
+            
+            // Scene scale based on event type
+            const sceneScale = event.name === 'Sadi' ? (isMobile ? 'scale(0.4)' : 'scale(1)') : (isMobile ? 'scale(0.45)' : 'scale(1)');
+            const sceneBottom = event.name === 'Sadi' ? 'bottom-[10%]' : 'bottom-[15%]';
+            
+            return (
+              <React.Fragment key={event.name}>
+                {/* Arrow Signboard */}
+                <ArrowSignboard 
+                  x={baseX + arrowOffset} 
+                  eventName={event.name} 
+                  direction="right" 
+                />
+                
+                {/* Event Banner */}
+                <EventBanner 
+                  x={baseX + bannerOffset} 
+                  title={event.name}
+                  subtitle={event.subtitle} 
+                  isActive={progress >= activeStart && progress <= activeEnd}
+                />
+                
+                {/* Scene */}
+                <div 
+                  className={`absolute ${sceneBottom} origin-bottom-left`}
+                  style={{ 
+                    left: baseX + sceneOffset,
+                    transform: sceneScale
+                  }}
+                >
+                  <SceneComponent x={0} />
+                </div>
+                
+                {/* Garlands */}
+                {Array.from({ length: event.garlandCount }).map((_, i) => (
+                  <Garland 
+                    key={`garland-${i}`}
+                    x={baseX + (i * garlandSpacing)} 
+                    y={isMobile ? (40 + i * 10) : (60 + i * 20)} 
+                    width={isMobile ? (140 + i * 20) : (280 + i * 40)} 
+                  />
+                ))}
+                
+                {/* Disco Lights */}
+                {event.hasDiscoLights && (
+                  <DiscoLights 
+                    x={baseX - (isMobile ? 100 : 200)} 
+                    width={isMobile ? 500 : 800} 
+                    isActive={progress >= activeStart && progress <= activeEnd} 
+                  />
+                )}
+                
+                {/* Wedding Lights */}
+                {event.hasWeddingLights && (
+                  <WeddingLights 
+                    x={baseX - (isMobile ? 100 : 200)} 
+                    width={isMobile ? 600 : 1000} 
+                    isActive={progress >= activeStart && progress <= activeEnd} 
+                  />
+                )}
+                
+                {/* Fireworks */}
+                {event.hasFireworks && (
+                  <Fireworks 
+                    x={baseX - (isMobile ? 150 : 300)} 
+                    width={isMobile ? 700 : 1100} 
+                    isActive={progress >= activeStart && progress <= activeEnd} 
+                  />
+                )}
+                
+                {/* Haldi Splashes */}
+                {event.hasSplashes && (
+                  <>
+                    {(isMobile ? [baseX + 200, baseX + 250, baseX + 300] : [baseX + 200, baseX + 250, baseX + 300]).map((hx, i) => (
+                      <div key={`splash-${i}`} className="absolute bottom-[20%] opacity-30" style={{ left: hx }}>
+                        <div className={`${isMobile ? 'w-8 h-8' : 'w-16 h-16'} rounded-full bg-[#ffd700] blur-xl`} />
+                      </div>
+                    ))}
+                  </>
+                )}
+                
+                {/* Flower Petals for Sadi */}
+                {event.hasPetals && (
+                  <>
+                    {Array.from({ length: isMobile ? 8 : 20 }).map((_, i) => (
+                      <div
+                        key={`petal-${i}`}
+                        className="absolute petal"
+                        style={{
+                          left: (baseX + sceneOffset + 50) + (i % 5) * (isMobile ? 50 : 100),
+                          top: '10%',
+                          '--fall-duration': `${6 + (i % 4)}s`,
+                          '--fall-delay': `${(i * 0.5) % 5}s`,
+                        } as React.CSSProperties}
+                      >
+                        <span className={`text-pink-400 ${isMobile ? 'text-xs' : 'text-lg'}`}>🌸</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </React.Fragment>
+            );
+          })}
 
           {/* ===== FINALE SECTION ===== */}
-          {/* Arrow signboard pointing to Home/Finale */}
-          <ArrowSignboard x={isMobile ? 4500 : 9800} eventName="Home" direction="right" />
-          
-          {/* Finale Home with welcoming family */}
+          <ArrowSignboard x={isMobile ? 9500 : 19000} eventName="Home" direction="right" />
+          {/* Home Banner - spaced from house with larger gap */}
+          <EventBanner 
+            x={isMobile ? 9600 : 19200} 
+            title="Welcome Home" 
+            subtitle="Happily Ever After" 
+            isActive={progress >= 0.92 && progress <= 0.98}
+          />
           <div 
             className="absolute bottom-[15%]"
-            style={{ left: isMobile ? 4800 : 10300 }}
+            style={{ left: isMobile ? 10200 : 20400 }}
           >
             {/* Beautiful decorated home */}
             <svg width={isMobile ? 200 : 400} height={isMobile ? 200 : 380} viewBox="0 0 400 380">
@@ -742,11 +832,11 @@ export default function WeddingJourney() {
             </svg>
           </div>
           
-          {/* Bride waiting at the end - visible when hugging */}
+          {/* Bride waiting at Welcome Home - visible when hugging */}
           <div 
             className="absolute bottom-[8%] sm:bottom-[6%] md:bottom-[6%]" 
             style={{ 
-              left: isMobile ? 5100 : 10850
+              left: isMobile ? 10200 : 20400
             }}
           >
             <Bride isMoving={false} scale={isMobile ? 0.5 : 1.2} />
@@ -837,10 +927,10 @@ export default function WeddingJourney() {
 
           {/* Rockets launching - animate up and fade when bride reaches groom */}
           {[
-            { x: isMobile ? 4820 : 10350, delay: 0.3 },
-            { x: isMobile ? 4920 : 10500, delay: 0.8 },
-            { x: isMobile ? 5020 : 10650, delay: 1.3 },
-            { x: isMobile ? 5080 : 10750, delay: 1.8 },
+            { x: isMobile ? 9900 : 19800, delay: 0.3 },
+            { x: isMobile ? 10000 : 20000, delay: 0.8 },
+            { x: isMobile ? 10100 : 20200, delay: 1.3 },
+            { x: isMobile ? 10150 : 20300, delay: 1.8 },
           ].map((rocket, idx) => (
             <div 
               key={`rocket-${idx}`}
@@ -1066,7 +1156,7 @@ export default function WeddingJourney() {
 
           {/* Confetti at finale when reached */}
           {reachedEnd && (
-            <div className="absolute" style={{ left: isMobile ? 4800 : 10500 }}>
+            <div className="absolute" style={{ left: isMobile ? 9900 : 19800 }}>
               {Array.from({ length: isMobile ? 20 : 50 }).map((_, i) => (
                 <div
                   key={i}
@@ -1092,7 +1182,7 @@ export default function WeddingJourney() {
           {reachedEnd && (
             <motion.div
               className="absolute top-[8%] sm:top-[12%] md:top-[20%]"
-              style={{ left: isMobile ? 4800 : 10550 }}
+              style={{ left: isMobile ? 9900 : 19800 }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -1103,14 +1193,9 @@ export default function WeddingJourney() {
               >
                 Happily Ever After
               </h1>
-              <p
-                className="text-[10px] sm:text-sm md:text-xl text-[#f4e4bc] text-center mt-1 sm:mt-2 md:mt-4"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                ❤️ Thank you for joining our journey ❤️
-              </p>
             </motion.div>
           )}
+
         </div>
       </ParallaxEngine>
 
@@ -1124,10 +1209,11 @@ export default function WeddingJourney() {
         }}
       >
         <Groom 
-          isMoving={isWalking && !reachedEnd && !isHugging} 
+          isMoving={isWalking && !reachedEnd && !isHugging && !isInSangeetSection && !isInBaratSection} 
           scale={isMobile ? 0.75 : 1.8} 
           facingLeft={facingDirection === 'left'}
           isHugging={isHugging}
+          isDancing={isInSangeetSection || isInBaratSection}
         />
       </div>
 
@@ -1167,7 +1253,22 @@ export default function WeddingJourney() {
       </div>
 
       {/* ========== SOUND MANAGER ========== */}
-      <SoundManager isPlaying={gameStarted} />
+      <SoundManager isPlaying={gameStarted} isPaused={isInSangeetSection || isInBaratSection || isInWeddingSection} />
+      
+      {/* ========== SANGEET MUSIC MANAGER ========== */}
+      <SangeetMusicManager 
+        progress={progress}
+      />
+      
+      {/* ========== BARAT MUSIC MANAGER ========== */}
+      <BaratMusicManager 
+        progress={progress}
+      />
+      
+      {/* ========== WEDDING MUSIC MANAGER ========== */}
+      <WeddingMusicManager 
+        progress={progress}
+      />
     </div>
   );
 }

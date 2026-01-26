@@ -4,9 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 
 interface SoundManagerProps {
   isPlaying: boolean;
+  isPaused?: boolean; // New prop to pause background music
 }
 
-const SoundManager: React.FC<SoundManagerProps> = ({ isPlaying }) => {
+const SoundManager: React.FC<SoundManagerProps> = ({ isPlaying, isPaused = false }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -40,14 +41,14 @@ const SoundManager: React.FC<SoundManagerProps> = ({ isPlaying }) => {
   useEffect(() => {
     if (!audioRef.current) return;
 
-    if (isPlaying && !isMuted && isLoaded) {
+    if (isPlaying && !isMuted && isLoaded && !isPaused) {
       audioRef.current.play().catch((e) => {
         console.log('Audio play failed:', e);
       });
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, isMuted, isLoaded]);
+  }, [isPlaying, isMuted, isLoaded, isPaused]);
 
   const toggleMute = () => {
     setIsMuted(!isMuted);

@@ -453,10 +453,10 @@ export const EventBanner: React.FC<{
 
   React.useEffect(() => {
     if (isActive) {
-      // Delay showing the banner by 600ms after entering section
+      // Delay showing the banner by 300ms after entering section (reduced for faster appearance)
       timeoutRef.current = setTimeout(() => {
         setShowBanner(true);
-      }, 600);
+      }, 300);
     } else {
       // Hide immediately when leaving
       setShowBanner(false);
@@ -474,11 +474,11 @@ export const EventBanner: React.FC<{
 
   return (
   <motion.div 
-    className="absolute top-0 origin-top scale-50 sm:scale-75 md:scale-100 z-30" 
+    className="absolute top-0 origin-top scale-50 sm:scale-75 md:scale-100 z-40" 
     style={{ left: x, position: 'absolute' }}
     initial={{ y: -200, opacity: 0 }}
     animate={{ 
-      y: showBanner ? 40 : -320, 
+      y: showBanner ? 80 : -400, 
       opacity: showBanner ? 1 : 0,
     }}
     transition={{ 
@@ -489,8 +489,8 @@ export const EventBanner: React.FC<{
     }}
   >
     <div className="relative">
-      {/* Fancy Hanging Ropes with Banner */}
-      <svg width="280" height="320" viewBox="0 0 280 320">
+      {/* Fancy Hanging Ropes with Banner - Wider */}
+      <svg width="360" height="400" viewBox="0 0 360 400">
         <defs>
           {/* Gold gradient for ropes */}
           <linearGradient id="ropeGold" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -514,100 +514,102 @@ export const EventBanner: React.FC<{
           </radialGradient>
         </defs>
 
-        {/* Top decorative bar (where ropes attach) */}
-        <rect x="20" y="0" width="240" height="10" fill="url(#ropeGold)" rx="5" />
-        <circle cx="35" cy="5" r="7" fill="url(#beadGold)" />
-        <circle cx="245" cy="5" r="7" fill="url(#beadGold)" />
-        <circle cx="140" cy="5" r="6" fill="url(#jewelRed)" />
+        {/* Top decorative bar (where ropes attach) - bigger and wider */}
+        <rect x="20" y="0" width="320" height="14" fill="url(#ropeGold)" rx="7" />
+        <circle cx="40" cy="7" r="9" fill="url(#beadGold)" />
+        <circle cx="320" cy="7" r="9" fill="url(#beadGold)" />
+        <circle cx="180" cy="7" r="8" fill="url(#jewelRed)" />
 
         {/* Left rope with beads and twist */}
         <g>
-          {/* Main rope strand */}
+          {/* Main rope strand - longer and thicker */}
           <path 
-            d="M50 10 Q40 60 50 110 Q60 160 50 170" 
+            d="M50 14 Q40 80 50 150 Q60 220 50 250" 
             fill="none" 
             stroke="url(#ropeGold)" 
-            strokeWidth="10"
+            strokeWidth="16"
             strokeLinecap="round"
           />
           {/* Rope twist overlay */}
           <path 
-            d="M50 10 Q60 60 50 110 Q40 160 50 170" 
+            d="M50 14 Q60 80 50 150 Q40 220 50 250" 
             fill="none" 
             stroke="#B8960C" 
-            strokeWidth="3"
-            strokeDasharray="8,8"
+            strokeWidth="5"
+            strokeDasharray="10,10"
           />
-          {/* Decorative beads */}
-          <circle cx="46" cy="35" r="7" fill="url(#beadGold)" />
-          <circle cx="54" cy="65" r="6" fill="url(#jewelRed)" />
-          <circle cx="47" cy="95" r="7" fill="url(#beadGold)" />
-          <circle cx="53" cy="125" r="6" fill="url(#jewelRed)" />
-          <circle cx="50" cy="155" r="8" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
+          {/* Decorative beads - bigger */}
+          <circle cx="46" cy="50" r="9" fill="url(#beadGold)" />
+          <circle cx="54" cy="90" r="8" fill="url(#jewelRed)" />
+          <circle cx="47" cy="130" r="9" fill="url(#beadGold)" />
+          <circle cx="53" cy="170" r="8" fill="url(#jewelRed)" />
+          <circle cx="50" cy="210" r="10" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
+          <circle cx="50" cy="240" r="11" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
         </g>
 
         {/* Right rope with beads and twist */}
         <g>
-          {/* Main rope strand */}
+          {/* Main rope strand - longer and thicker */}
           <path 
-            d="M230 10 Q240 60 230 110 Q220 160 230 170" 
+            d="M310 14 Q320 80 310 150 Q300 220 310 250" 
             fill="none" 
             stroke="url(#ropeGold)" 
-            strokeWidth="10"
+            strokeWidth="16"
             strokeLinecap="round"
           />
           {/* Rope twist overlay */}
           <path 
-            d="M230 10 Q220 60 230 110 Q240 160 230 170" 
+            d="M310 14 Q300 80 310 150 Q320 220 310 250" 
             fill="none" 
             stroke="#B8960C" 
-            strokeWidth="3"
-            strokeDasharray="8,8"
+            strokeWidth="5"
+            strokeDasharray="10,10"
           />
-          {/* Decorative beads */}
-          <circle cx="234" cy="35" r="7" fill="url(#beadGold)" />
-          <circle cx="226" cy="65" r="6" fill="url(#jewelRed)" />
-          <circle cx="233" cy="95" r="7" fill="url(#beadGold)" />
-          <circle cx="227" cy="125" r="6" fill="url(#jewelRed)" />
-          <circle cx="230" cy="155" r="8" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
+          {/* Decorative beads - bigger */}
+          <circle cx="314" cy="50" r="9" fill="url(#beadGold)" />
+          <circle cx="306" cy="90" r="8" fill="url(#jewelRed)" />
+          <circle cx="313" cy="130" r="9" fill="url(#beadGold)" />
+          <circle cx="307" cy="170" r="8" fill="url(#jewelRed)" />
+          <circle cx="310" cy="210" r="10" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
+          <circle cx="310" cy="240" r="11" fill="url(#beadGold)" stroke="#8B6914" strokeWidth="2" />
         </g>
 
-        {/* Decorative swag chain between ropes */}
+        {/* Decorative swag chain between ropes - adjusted for wider banner */}
         <path 
-          d="M60 30 Q140 55 220 30" 
+          d="M60 50 Q180 80 300 50" 
           fill="none" 
           stroke="url(#ropeGold)" 
-          strokeWidth="5"
+          strokeWidth="7"
         />
-        {/* Beads on swag chain */}
-        <circle cx="100" cy="38" r="5" fill="url(#jewelRed)" />
-        <circle cx="140" cy="45" r="6" fill="url(#beadGold)" />
-        <circle cx="180" cy="38" r="5" fill="url(#jewelRed)" />
+        {/* Beads on swag chain - bigger */}
+        <circle cx="120" cy="60" r="7" fill="url(#jewelRed)" />
+        <circle cx="180" cy="70" r="8" fill="url(#beadGold)" />
+        <circle cx="240" cy="60" r="7" fill="url(#jewelRed)" />
 
-        {/* Main Banner */}
-        <g transform="translate(15, 165)">
+        {/* Main Banner - moved down and wider */}
+        <g transform="translate(15, 245)">
           {/* Banner shadow */}
           <path
-            d="M17 14 L233 14 L233 76 L125 100 L17 76 Z"
+            d="M17 14 L313 14 L313 76 L165 100 L17 76 Z"
             fill="rgba(0,0,0,0.25)"
           />
           {/* Banner body - maroon with gold border */}
           <path
-            d="M15 12 L235 12 L235 74 L125 98 L15 74 Z"
+            d="M15 12 L315 12 L315 74 L165 98 L15 74 Z"
             fill="#800020"
             stroke="#d4af37"
             strokeWidth="3"
           />
           {/* Inner decorative border */}
           <path
-            d="M25 20 L225 20 L225 68 L125 88 L25 68 Z"
+            d="M25 20 L305 20 L305 68 L165 88 L25 68 Z"
             fill="none"
             stroke="#d4af37"
             strokeWidth="1.5"
             opacity="0.5"
           />
-          {/* Top decorative bar */}
-          <rect x="10" y="6" width="230" height="14" fill="url(#ropeGold)" rx="5" />
+          {/* Top decorative bar - wider */}
+          <rect x="10" y="6" width="310" height="14" fill="url(#ropeGold)" rx="5" />
           
           {/* Corner rosettes - left */}
           <g transform="translate(15, 12)">
@@ -616,14 +618,14 @@ export const EventBanner: React.FC<{
             <circle r="3" fill="#FFE4A0" />
           </g>
           {/* Corner rosettes - right */}
-          <g transform="translate(235, 12)">
+          <g transform="translate(315, 12)">
             <circle r="14" fill="url(#beadGold)" />
             <circle r="8" fill="url(#jewelRed)" />
             <circle r="3" fill="#FFE4A0" />
           </g>
 
-          {/* Marigold flowers on top bar */}
-          {[55, 95, 125, 155, 195].map((fx, i) => (
+          {/* Marigold flowers on top bar - more flowers for wider banner */}
+          {[70, 110, 150, 165, 180, 220, 260].map((fx, i) => (
             <g key={i} transform={`translate(${fx}, 10)`}>
               <circle r="8" fill="#FF8C00" />
               <circle r="5" fill="#FFA500" />
@@ -633,7 +635,7 @@ export const EventBanner: React.FC<{
 
           {/* Bottom tassels */}
           {/* Left tassel */}
-          <g transform="translate(55, 74)">
+          <g transform="translate(70, 74)">
             <line x1="0" y1="0" x2="0" y2="22" stroke="url(#ropeGold)" strokeWidth="5" />
             <ellipse cx="0" cy="28" rx="8" ry="10" fill="url(#beadGold)" />
             <circle cx="0" cy="28" r="5" fill="url(#jewelRed)" />
@@ -641,7 +643,7 @@ export const EventBanner: React.FC<{
             <path d="M-4 38 L0 52 L4 38" fill="#F4E4BC" />
           </g>
           {/* Center tassel (larger) */}
-          <g transform="translate(125, 98)">
+          <g transform="translate(165, 98)">
             <line x1="0" y1="0" x2="0" y2="20" stroke="url(#ropeGold)" strokeWidth="6" />
             <ellipse cx="0" cy="28" rx="12" ry="14" fill="url(#beadGold)" />
             <circle cx="0" cy="28" r="7" fill="url(#jewelRed)" />
@@ -650,7 +652,7 @@ export const EventBanner: React.FC<{
             <path d="M-6 42 L0 60 L6 42" fill="#F4E4BC" />
           </g>
           {/* Right tassel */}
-          <g transform="translate(195, 74)">
+          <g transform="translate(260, 74)">
             <line x1="0" y1="0" x2="0" y2="22" stroke="url(#ropeGold)" strokeWidth="5" />
             <ellipse cx="0" cy="28" rx="8" ry="10" fill="url(#beadGold)" />
             <circle cx="0" cy="28" r="5" fill="url(#jewelRed)" />
@@ -660,21 +662,41 @@ export const EventBanner: React.FC<{
         </g>
       </svg>
 
-      {/* Text overlay */}
+      {/* Text overlay - improved fonts and wider layout */}
       <div 
         className="absolute flex flex-col items-center justify-center"
-        style={{ top: 195, left: 35, width: 210, height: 55 }}
+        style={{ 
+          top: 275, 
+          left: 'clamp(25px, 10%, 40px)', 
+          width: 'clamp(250px, 85%, 300px)', 
+          height: title.length > 15 ? 80 : 65 
+        }}
       >
         <h2
-          className="text-2xl font-bold text-[#d4af37] drop-shadow-lg"
-          style={{ fontFamily: 'Playfair Display, serif', textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}
+          className="font-extrabold text-[#d4af37] drop-shadow-2xl text-center px-2 tracking-wide"
+          style={{ 
+            fontFamily: '"Playfair Display", "Georgia", serif', 
+            textShadow: '3px 3px 6px rgba(0,0,0,0.8), 1px 1px 2px rgba(0,0,0,0.9)',
+            fontSize: title.length > 15 ? 'clamp(1.1rem, 3.5vw, 1.4rem)' : 'clamp(1.4rem, 4vw, 1.9rem)',
+            lineHeight: '1.3',
+            wordBreak: 'break-word',
+            letterSpacing: '0.05em',
+            fontWeight: 800,
+          }}
         >
           {title}
         </h2>
         {subtitle && (
           <p 
-            className="text-sm text-[#f4e4bc] drop-shadow-md" 
-            style={{ fontFamily: 'Dancing Script, cursive', textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
+            className="text-[#f4e4bc] drop-shadow-lg text-center px-2 mt-2 italic" 
+            style={{ 
+              fontFamily: '"Dancing Script", "Brush Script MT", cursive', 
+              textShadow: '2px 2px 4px rgba(0,0,0,0.7), 1px 1px 2px rgba(0,0,0,0.8)',
+              fontSize: 'clamp(0.95rem, 2.8vw, 1.3rem)',
+              lineHeight: '1.4',
+              letterSpacing: '0.03em',
+              fontWeight: 600,
+            }}
           >
             {subtitle}
           </p>
@@ -1013,6 +1035,40 @@ export const SangeetScene: React.FC<{ x: number }> = ({ x }) => (
           <Guest isMoving={true} variant="female" color={['#ff6b35', '#ff1493', '#9932cc'][i]} />
         </div>
       ))}
+      
+      {/* Big Speakers - Left */}
+      <div className="absolute bottom-[80px] left-[20px]">
+        <svg width="100" height="150" viewBox="0 0 100 150">
+          {/* Speaker box */}
+          <rect x="10" y="20" width="80" height="130" fill="#1a1a1a" rx="5" />
+          <rect x="15" y="25" width="70" height="120" fill="#2d2d2d" rx="3" />
+          {/* Speaker grille */}
+          <rect x="25" y="40" width="50" height="90" fill="#000" rx="2" />
+          {/* Speaker cone */}
+          <circle cx="50" cy="85" r="20" fill="#333" />
+          <circle cx="50" cy="85" r="12" fill="#1a1a1a" />
+          <circle cx="50" cy="85" r="6" fill="#000" />
+          {/* Speaker stand */}
+          <rect x="45" y="150" width="10" height="20" fill="#1a1a1a" />
+        </svg>
+      </div>
+      
+      {/* Big Speakers - Right */}
+      <div className="absolute bottom-[80px] right-[20px]">
+        <svg width="100" height="150" viewBox="0 0 100 150">
+          {/* Speaker box */}
+          <rect x="10" y="20" width="80" height="130" fill="#1a1a1a" rx="5" />
+          <rect x="15" y="25" width="70" height="120" fill="#2d2d2d" rx="3" />
+          {/* Speaker grille */}
+          <rect x="25" y="40" width="50" height="90" fill="#000" rx="2" />
+          {/* Speaker cone */}
+          <circle cx="50" cy="85" r="20" fill="#333" />
+          <circle cx="50" cy="85" r="12" fill="#1a1a1a" />
+          <circle cx="50" cy="85" r="6" fill="#000" />
+          {/* Speaker stand */}
+          <rect x="45" y="150" width="10" height="20" fill="#1a1a1a" />
+        </svg>
+      </div>
       
       {/* DJ/Musicians */}
       <div className="absolute bottom-[100px] left-[380px]">
@@ -2295,6 +2351,403 @@ export const FinaleHome: React.FC<{ x: number }> = ({ x }) => (
             '--fall-delay': petal.delay,
           } as React.CSSProperties}
         />
+      ))}
+    </div>
+  </div>
+);
+
+// Churmati Scene (Morning welcome with speakers and people)
+export const ChurmatiScene: React.FC<{ x: number }> = ({ x }) => (
+  <div className={x === 0 ? "relative" : "absolute bottom-[15%]"} style={x !== 0 ? { left: x } : undefined}>
+    <div className="relative w-[550px] h-[400px]">
+      {/* Background glow */}
+      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-orange-300/30 via-yellow-200/20 to-transparent rounded-full blur-3xl" />
+      
+      {/* Large speakers - lowered */}
+      <div className="absolute bottom-[50px] left-[50px]">
+        <svg width="120" height="180" viewBox="0 0 120 180">
+          {/* Speaker cabinet */}
+          <rect x="10" y="20" width="100" height="160" fill="#1a1a1a" rx="8" />
+          <rect x="15" y="25" width="90" height="150" fill="#2d2d2d" rx="5" />
+          {/* Speaker grille */}
+          <circle cx="60" cy="100" r="35" fill="none" stroke="#444" strokeWidth="3" />
+          <circle cx="60" cy="100" r="25" fill="none" stroke="#444" strokeWidth="2" />
+          <circle cx="60" cy="100" r="15" fill="#333" />
+          {/* Sound waves */}
+          <path d="M0 100 Q20 90 40 100" stroke="#ffd700" strokeWidth="3" fill="none" opacity="0.6" />
+          <path d="M80 100 Q100 90 120 100" stroke="#ffd700" strokeWidth="3" fill="none" opacity="0.6" />
+        </svg>
+      </div>
+      
+      <div className="absolute bottom-[50px] right-[50px]">
+        <svg width="120" height="180" viewBox="0 0 120 180">
+          <rect x="10" y="20" width="100" height="160" fill="#1a1a1a" rx="8" />
+          <rect x="15" y="25" width="90" height="150" fill="#2d2d2d" rx="5" />
+          <circle cx="60" cy="100" r="35" fill="none" stroke="#444" strokeWidth="3" />
+          <circle cx="60" cy="100" r="25" fill="none" stroke="#444" strokeWidth="2" />
+          <circle cx="60" cy="100" r="15" fill="#333" />
+        </svg>
+      </div>
+      
+      {/* People around - lowered */}
+      {[
+        { x: 200, y: 30 },
+        { x: 300, y: 50 },
+        { x: 400, y: 30 },
+        { x: 250, y: 110 },
+        { x: 350, y: 130 },
+      ].map((pos, i) => (
+        <div key={i} className="absolute" style={{ left: pos.x, bottom: pos.y }}>
+          <svg width="50" height="80" viewBox="0 0 50 80">
+            <circle cx="25" cy="15" r="12" fill="#d2b48c" />
+            <rect x="15" y="25" width="20" height="30" fill={['#ff6b35', '#4a90e2', '#ff1493', '#00ced1', '#ffd700'][i]} rx="3" />
+            <rect x="10" y="55" width="30" height="25" fill="#333" rx="2" />
+          </svg>
+        </div>
+      ))}
+      
+      {/* Breakfast table */}
+      <div className="absolute bottom-[50px] left-1/2 -translate-x-1/2">
+        <svg width="300" height="80" viewBox="0 0 300 80">
+          <rect x="0" y="0" width="300" height="20" fill="#8b4513" rx="5" />
+          {/* Food items */}
+          <circle cx="50" cy="10" r="8" fill="#ffd700" />
+          <circle cx="150" cy="10" r="8" fill="#ff6b35" />
+          <circle cx="250" cy="10" r="8" fill="#ff1493" />
+        </svg>
+      </div>
+    </div>
+  </div>
+);
+
+// Engagement Scene (7 people, lighting, flowers)
+export const EngagementScene: React.FC<{ x: number }> = ({ x }) => (
+  <div className={x === 0 ? "relative" : "absolute bottom-[15%]"} style={x !== 0 ? { left: x } : undefined}>
+    <div className="relative w-[550px] h-[400px]">
+      {/* Lighting effects */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-20 bg-gradient-to-b from-yellow-300 to-transparent opacity-60 animate-pulse"
+            style={{
+              left: `${10 + i * 12}%`,
+              top: '10%',
+              animationDelay: `${i * 0.2}s`,
+              transform: `rotate(${i % 2 === 0 ? '5deg' : '-5deg'})`,
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Flower decorations */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute animate-float"
+          style={{
+            left: `${5 + (i * 5)}%`,
+            top: `${10 + (i % 3) * 15}%`,
+            animationDelay: `${i * 0.3}s`,
+          }}
+        >
+          <span className="text-2xl">🌸</span>
+        </div>
+      ))}
+      
+      {/* 7 People arranged in a circle - lowered */}
+      {[
+        { x: 200, y: 50, angle: 0 },
+        { x: 100, y: 20, angle: -45 },
+        { x: 50, y: 100, angle: -90 },
+        { x: 100, y: 180, angle: -135 },
+        { x: 200, y: 210, angle: 180 },
+        { x: 300, y: 180, angle: 135 },
+        { x: 350, y: 100, angle: 90 },
+      ].map((pos, i) => (
+        <div key={i} className="absolute" style={{ left: pos.x, bottom: pos.y }}>
+          <svg width="60" height="90" viewBox="0 0 60 90">
+            <circle cx="30" cy="18" r="14" fill="#d2b48c" />
+            <rect x="18" y="30" width="24" height="35" fill={['#d4af37', '#ff6b35', '#ff1493', '#4a90e2', '#00ced1', '#ffd700', '#c77dff'][i]} rx="4" />
+            <rect x="12" y="65" width="36" height="25" fill="#333" rx="3" />
+            {/* Engagement ring sparkle */}
+            {i === 0 && (
+              <circle cx="30" cy="45" r="3" fill="#ffd700" className="animate-ping" />
+            )}
+          </svg>
+        </div>
+      ))}
+      
+      {/* Center engagement setup - lowered */}
+      <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2">
+        <svg width="100" height="80" viewBox="0 0 100 80">
+          <circle cx="50" cy="40" r="25" fill="#d4af37" opacity="0.3" />
+          <circle cx="50" cy="40" r="15" fill="#ffd700" opacity="0.5" />
+          <text x="50" y="45" textAnchor="middle" fill="#d4af37" fontSize="20" fontWeight="bold">💍</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+);
+
+// Barat Scene (DJs, music, lights, dancing people)
+export const BaratScene: React.FC<{ x: number }> = ({ x }) => (
+  <div className={x === 0 ? "relative" : "absolute bottom-[15%]"} style={x !== 0 ? { left: x } : undefined}>
+    <div className="relative w-[550px] h-[400px]">
+      {/* Disco lights background */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-full h-8 opacity-30"
+            style={{
+              top: `${i * 8}%`,
+              background: `linear-gradient(90deg, transparent, ${['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'][i % 6]}, transparent)`,
+              animation: `pulse 1s ease-in-out infinite`,
+              animationDelay: `${i * 0.1}s`,
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Big Speakers - Left */}
+      <div className="absolute bottom-[180px] left-[30px]">
+        <svg width="120" height="180" viewBox="0 0 120 180">
+          {/* Speaker box */}
+          <rect x="10" y="20" width="100" height="160" fill="#1a1a1a" rx="5" />
+          <rect x="15" y="25" width="90" height="150" fill="#2d2d2d" rx="3" />
+          {/* Speaker grille */}
+          <rect x="25" y="40" width="70" height="130" fill="#000" rx="2" />
+          {/* Speaker cone */}
+          <circle cx="60" cy="105" r="25" fill="#333" />
+          <circle cx="60" cy="105" r="15" fill="#1a1a1a" />
+          <circle cx="60" cy="105" r="8" fill="#000" />
+          {/* Speaker stand */}
+          <rect x="55" y="180" width="10" height="25" fill="#1a1a1a" />
+          {/* Decorative lights on speaker */}
+          <circle cx="30" cy="60" r="3" fill="#ff0000" className="animate-pulse" />
+          <circle cx="90" cy="60" r="3" fill="#00ff00" className="animate-pulse" />
+        </svg>
+      </div>
+      
+      {/* Big Speakers - Right */}
+      <div className="absolute bottom-[180px] right-[30px]">
+        <svg width="120" height="180" viewBox="0 0 120 180">
+          {/* Speaker box */}
+          <rect x="10" y="20" width="100" height="160" fill="#1a1a1a" rx="5" />
+          <rect x="15" y="25" width="90" height="150" fill="#2d2d2d" rx="3" />
+          {/* Speaker grille */}
+          <rect x="25" y="40" width="70" height="130" fill="#000" rx="2" />
+          {/* Speaker cone */}
+          <circle cx="60" cy="105" r="25" fill="#333" />
+          <circle cx="60" cy="105" r="15" fill="#1a1a1a" />
+          <circle cx="60" cy="105" r="8" fill="#000" />
+          {/* Speaker stand */}
+          <rect x="55" y="180" width="10" height="25" fill="#1a1a1a" />
+          {/* Decorative lights on speaker */}
+          <circle cx="30" cy="60" r="3" fill="#0000ff" className="animate-pulse" />
+          <circle cx="90" cy="60" r="3" fill="#ffff00" className="animate-pulse" />
+        </svg>
+      </div>
+      
+      {/* DJ Setup */}
+      <div className="absolute bottom-[200px] left-1/2 -translate-x-1/2">
+        <svg width="200" height="150" viewBox="0 0 200 150">
+          {/* DJ Table */}
+          <rect x="20" y="80" width="160" height="70" fill="#1a1a1a" rx="5" />
+          <rect x="25" y="85" width="150" height="60" fill="#2d2d2d" rx="3" />
+          {/* Mixer */}
+          <rect x="40" y="95" width="60" height="40" fill="#333" rx="2" />
+          {/* Turntables */}
+          <circle cx="130" cy="115" r="20" fill="#000" />
+          <circle cx="130" cy="115" r="15" fill="#1a1a1a" />
+          <circle cx="130" cy="115" r="3" fill="#fff" />
+          <circle cx="170" cy="115" r="20" fill="#000" />
+          <circle cx="170" cy="115" r="15" fill="#1a1a1a" />
+          <circle cx="170" cy="115" r="3" fill="#fff" />
+        </svg>
+      </div>
+      
+      {/* Dancing people */}
+      {[
+        { x: 50, y: 100 },
+        { x: 150, y: 120 },
+        { x: 250, y: 100 },
+        { x: 350, y: 130 },
+        { x: 450, y: 110 },
+        { x: 100, y: 200 },
+        { x: 200, y: 220 },
+        { x: 300, y: 200 },
+      ].map((pos, i) => (
+        <motion.div
+          key={i}
+          className="absolute"
+          style={{ left: pos.x, bottom: pos.y }}
+          animate={{
+            y: [0, -10, 0],
+            rotate: [0, 5, -5, 0],
+          }}
+          transition={{
+            duration: 0.5,
+            repeat: Infinity,
+            delay: i * 0.1,
+          }}
+        >
+          <svg width="50" height="80" viewBox="0 0 50 80">
+            <circle cx="25" cy="15" r="12" fill="#d2b48c" />
+            <rect x="15" y="25" width="20" height="30" fill={['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff6b35', '#ff1493'][i]} rx="3" />
+            <rect x="10" y="55" width="30" height="25" fill="#333" rx="2" />
+            {/* Arms up dancing */}
+            <line x1="15" y1="30" x2="5" y2="10" stroke="#d2b48c" strokeWidth="3" />
+            <line x1="35" y1="30" x2="45" y2="10" stroke="#d2b48c" strokeWidth="3" />
+          </svg>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
+
+// Reception Scene (Stage with sofa, groom & bride, lights, decorations)
+export const ReceptionScene: React.FC<{ x: number }> = ({ x }) => (
+  <div className={x === 0 ? "relative" : "absolute bottom-[15%]"} style={x !== 0 ? { left: x } : undefined}>
+    <div className="relative w-[550px] h-[400px]">
+      {/* Stage background */}
+      <div className="absolute bottom-0 left-0 w-full h-[250px] bg-gradient-to-t from-[#2d1f0f] via-[#3d2914] to-[#4a3520]" />
+      
+      {/* Stage platform */}
+      <div className="absolute bottom-[50px] left-1/2 -translate-x-1/2 w-[400px] h-[200px]">
+        <svg width="400" height="200" viewBox="0 0 400 200">
+          <rect x="0" y="0" width="400" height="200" fill="#8b4513" rx="10" />
+          <rect x="10" y="10" width="380" height="180" fill="#a0522d" rx="8" />
+          {/* Stage pattern */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <rect key={i} x={20 + i * 45} y="20" width="35" height="160" fill="#6b4423" opacity="0.3" />
+          ))}
+        </svg>
+      </div>
+      
+      {/* Decorative lights on stage */}
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute bottom-[240px] animate-pulse"
+          style={{
+            left: `${5 + i * 10}%`,
+            width: '20px',
+            height: '30px',
+            background: `radial-gradient(circle, ${['#ffd700', '#ff6b35', '#ff1493', '#4a90e2'][i % 4]}, transparent)`,
+            borderRadius: '50%',
+            animationDelay: `${i * 0.2}s`,
+          }}
+        />
+      ))}
+      
+      {/* Wedding Sofa */}
+      <div className="absolute bottom-[120px] left-1/2 -translate-x-1/2">
+        <svg width="300" height="150" viewBox="0 0 300 150">
+          {/* Sofa base */}
+          <rect x="0" y="50" width="300" height="100" fill="#8b4513" rx="10" />
+          <rect x="10" y="60" width="280" height="80" fill="#a0522d" rx="8" />
+          {/* Sofa back */}
+          <rect x="20" y="20" width="260" height="40" fill="#8b4513" rx="5" />
+          <rect x="25" y="25" width="250" height="30" fill="#a0522d" rx="3" />
+          {/* Cushions */}
+          <rect x="30" y="70" width="100" height="60" fill="#d4af37" rx="5" />
+          <rect x="170" y="70" width="100" height="60" fill="#d4af37" rx="5" />
+          {/* Groom */}
+          <circle cx="80" cy="40" r="15" fill="#d2b48c" />
+          <rect x="70" y="50" width="20" height="40" fill="#4a90e2" rx="3" />
+          {/* Bride */}
+          <circle cx="220" cy="40" r="15" fill="#d2b48c" />
+          <rect x="210" y="50" width="20" height="40" fill="#ff1493" rx="3" />
+          {/* Crown/veil */}
+          <path d="M220 25 Q225 15 230 25" stroke="#d4af37" strokeWidth="3" fill="none" />
+        </svg>
+      </div>
+      
+      {/* Flower decorations around stage */}
+      {Array.from({ length: 15 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute"
+          style={{
+            left: `${10 + (i % 5) * 20}%`,
+            bottom: `${30 + Math.floor(i / 5) * 15}%`,
+          }}
+        >
+          <span className="text-2xl">🌺</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Satyanarayan Katha Scene (Stage with puja)
+export const SatyanarayanKathaScene: React.FC<{ x: number }> = ({ x }) => (
+  <div className={x === 0 ? "relative" : "absolute bottom-[15%]"} style={x !== 0 ? { left: x } : undefined}>
+    <div className="relative w-[550px] h-[400px]">
+      {/* Puja stage */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[450px] h-[300px]">
+        <svg width="450" height="300" viewBox="0 0 450 300">
+          {/* Stage base */}
+          <rect x="0" y="150" width="450" height="150" fill="#8b4513" rx="10" />
+          <rect x="10" y="160" width="430" height="130" fill="#a0522d" rx="8" />
+          
+          {/* Puja platform */}
+          <rect x="150" y="80" width="150" height="120" fill="#d4af37" rx="8" />
+          <rect x="160" y="90" width="130" height="100" fill="#ffd700" rx="5" />
+          
+          {/* Diya/lamps */}
+          {[180, 225, 270].map((dx, i) => (
+            <g key={i}>
+              <ellipse cx={dx} cy="140" rx="8" ry="4" fill="#cd7f32" />
+              <path d={`M${dx - 4} 140 Q${dx} 120 ${dx + 4} 140`} fill="#daa520" />
+              <circle cx={dx} cy="125" r="3" fill="#ffd700" className="animate-pulse" />
+            </g>
+          ))}
+          
+          {/* Puja items */}
+          <circle cx="190" cy="110" r="8" fill="#ff6b35" /> {/* Fruit */}
+          <circle cx="260" cy="110" r="8" fill="#ffd700" /> {/* Coconut */}
+          <rect x="220" y="105" width="10" height="15" fill="#8b4513" /> {/* Incense */}
+          
+          {/* Sacred symbol */}
+          <text x="225" y="135" textAnchor="middle" fill="#d4af37" fontSize="30" fontWeight="bold">🕉️</text>
+        </svg>
+      </div>
+      
+      {/* People sitting for puja - lowered */}
+      {[
+        { x: 100, y: 100 },
+        { x: 200, y: 120 },
+        { x: 300, y: 100 },
+        { x: 350, y: 120 },
+      ].map((pos, i) => (
+        <div key={i} className="absolute" style={{ left: pos.x, bottom: pos.y }}>
+          <svg width="60" height="80" viewBox="0 0 60 80">
+            <circle cx="30" cy="18" r="14" fill="#d2b48c" />
+            <rect x="18" y="30" width="24" height="35" fill={['#d4af37', '#8b4513', '#a0522d', '#6b4423'][i]} rx="4" />
+            <rect x="12" y="65" width="36" height="15" fill="#333" rx="2" />
+            {/* Hands in prayer */}
+            <ellipse cx="20" cy="50" rx="5" ry="8" fill="#d2b48c" transform="rotate(-20 20 50)" />
+            <ellipse cx="40" cy="50" rx="5" ry="8" fill="#d2b48c" transform="rotate(20 40 50)" />
+          </svg>
+        </div>
+      ))}
+      
+      {/* Floating flower petals */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute animate-float"
+          style={{
+            left: `${10 + (i * 8)}%`,
+            top: `${5 + (i % 3) * 10}%`,
+            animationDelay: `${i * 0.4}s`,
+          }}
+        >
+          <span className="text-xl">🌼</span>
+        </div>
       ))}
     </div>
   </div>

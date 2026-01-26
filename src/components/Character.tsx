@@ -7,22 +7,30 @@ interface CharacterProps {
   scale?: number;
   facingLeft?: boolean;
   isHugging?: boolean;
+  isDancing?: boolean;
 }
 
 // Groom character - Indian wedding attire (Sherwani)
-export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLeft = false, isHugging = false }) => {
+export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLeft = false, isHugging = false, isDancing = false }) => {
   const [frame, setFrame] = React.useState(0);
 
   React.useEffect(() => {
-    if (!isMoving) {
+    if (isDancing) {
+      // Faster animation for dancing
+      const interval = setInterval(() => {
+        setFrame((f) => (f + 1) % 8);
+      }, 80);
+      return () => clearInterval(interval);
+    } else if (!isMoving) {
       setFrame(0);
       return;
+    } else {
+      const interval = setInterval(() => {
+        setFrame((f) => (f + 1) % 8);
+      }, 100);
+      return () => clearInterval(interval);
     }
-    const interval = setInterval(() => {
-      setFrame((f) => (f + 1) % 8);
-    }, 100);
-    return () => clearInterval(interval);
-  }, [isMoving]);
+  }, [isMoving, isDancing]);
 
   // Walking animation phases
   const walkCycle = frame / 8;
@@ -30,18 +38,24 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
   const armPhase = Math.sin(walkCycle * Math.PI * 2 + Math.PI);
   const bodyBob = Math.abs(Math.sin(walkCycle * Math.PI * 4)) * 2;
 
-  // Leg angles for natural walking
-  const leftLegAngle = isMoving ? legPhase * 25 : 0;
-  const rightLegAngle = isMoving ? -legPhase * 25 : 0;
-  const leftKnee = isMoving ? Math.max(0, legPhase) * 30 : 0;
-  const rightKnee = isMoving ? Math.max(0, -legPhase) * 30 : 0;
+  // Dancing animation - jumping and dancing
+  const danceCycle = frame / 8;
+  const jumpHeight = isDancing ? Math.abs(Math.sin(danceCycle * Math.PI * 2)) * 25 : 0;
+  const danceRotation = isDancing ? Math.sin(danceCycle * Math.PI * 4) * 8 : 0;
+  const danceBounce = isDancing ? Math.abs(Math.sin(danceCycle * Math.PI * 4)) * 15 : 0;
 
-  // Arm swing - different for hugging pose
-  // When hugging, arms are wrapped around (forward and around)
-  const leftArmAngle = isHugging ? 60 : (isMoving ? armPhase * 15 : 0);
-  const rightArmAngle = isHugging ? -60 : (isMoving ? -armPhase * 15 : 0);
-  const leftArmBend = isHugging ? 45 : 0;
-  const rightArmBend = isHugging ? 45 : 0;
+  // Leg angles - more exaggerated for dancing
+  const leftLegAngle = isDancing ? Math.sin(danceCycle * Math.PI * 2) * 40 : (isMoving ? legPhase * 25 : 0);
+  const rightLegAngle = isDancing ? -Math.sin(danceCycle * Math.PI * 2) * 40 : (isMoving ? -legPhase * 25 : 0);
+  const leftKnee = isDancing ? Math.max(0, Math.sin(danceCycle * Math.PI * 2)) * 50 : (isMoving ? Math.max(0, legPhase) * 30 : 0);
+  const rightKnee = isDancing ? Math.max(0, -Math.sin(danceCycle * Math.PI * 2)) * 50 : (isMoving ? Math.max(0, -legPhase) * 30 : 0);
+
+  // Arm swing - different for hugging, dancing, or walking
+  // When dancing, arms go up in celebration
+  const leftArmAngle = isHugging ? 60 : (isDancing ? Math.sin(danceCycle * Math.PI * 2) * 60 + 30 : (isMoving ? armPhase * 15 : 0));
+  const rightArmAngle = isHugging ? -60 : (isDancing ? -Math.sin(danceCycle * Math.PI * 2) * 60 - 30 : (isMoving ? -armPhase * 15 : 0));
+  const leftArmBend = isHugging ? 45 : (isDancing ? 20 : 0);
+  const rightArmBend = isHugging ? 45 : (isDancing ? 20 : 0);
 
   return (
     <svg
@@ -50,16 +64,18 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
       viewBox="0 0 80 140"
       className="gpu-accelerate"
       style={{ 
-        transform: `translateY(${isMoving ? -bodyBob : 0}px) scaleX(${facingLeft ? -1 : 1})`,
+        transform: `translateY(${isDancing ? -jumpHeight - danceBounce : (isMoving ? -bodyBob : 0)}px) rotate(${isDancing ? danceRotation : 0}deg) scaleX(${facingLeft ? -1 : 1})`,
+        transition: isDancing ? 'none' : 'transform 0.1s ease-out',
       }}
     >
       {/* Shadow */}
       <ellipse
         cx="40"
         cy="138"
-        rx={isMoving ? 18 + Math.abs(legPhase) * 3 : 18}
+        rx={isDancing ? 18 + Math.abs(Math.sin(danceCycle * Math.PI * 2)) * 5 : (isMoving ? 18 + Math.abs(legPhase) * 3 : 18)}
         ry="4"
         fill="rgba(0,0,0,0.3)"
+        opacity={isDancing ? 0.5 + Math.abs(Math.sin(danceCycle * Math.PI * 2)) * 0.3 : 1}
       />
 
       {/* Left Leg */}
@@ -130,6 +146,16 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
             <ellipse cx="20" cy="88" rx="5" ry="6" fill="#f5deb3" />
           </g>
         </g>
+      ) : isDancing ? (
+        <g transform={`rotate(${leftArmAngle}, 25, 55)`}>
+          {/* Upper arm */}
+          <rect x="15" y="52" width="10" height="18" fill="#800020" rx="4" />
+          {/* Forearm bent for dancing */}
+          <g transform={`rotate(${leftArmBend}, 20, 70)`}>
+            <rect x="15" y="70" width="10" height="18" fill="#800020" rx="4" />
+            <ellipse cx="20" cy="88" rx="5" ry="6" fill="#f5deb3" />
+          </g>
+        </g>
       ) : (
         <g transform={`rotate(${leftArmAngle}, 25, 55)`}>
           <rect x="15" y="52" width="10" height="25" fill="#800020" rx="4" />
@@ -143,6 +169,16 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
           {/* Upper arm */}
           <rect x="55" y="52" width="10" height="18" fill="#800020" rx="4" />
           {/* Forearm bent for hugging */}
+          <g transform={`rotate(${rightArmBend}, 60, 70)`}>
+            <rect x="55" y="70" width="10" height="18" fill="#800020" rx="4" />
+            <ellipse cx="60" cy="88" rx="5" ry="6" fill="#f5deb3" />
+          </g>
+        </g>
+      ) : isDancing ? (
+        <g transform={`rotate(${rightArmAngle}, 55, 55)`}>
+          {/* Upper arm */}
+          <rect x="55" y="52" width="10" height="18" fill="#800020" rx="4" />
+          {/* Forearm bent for dancing */}
           <g transform={`rotate(${rightArmBend}, 60, 70)`}>
             <rect x="55" y="70" width="10" height="18" fill="#800020" rx="4" />
             <ellipse cx="60" cy="88" rx="5" ry="6" fill="#f5deb3" />

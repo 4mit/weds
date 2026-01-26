@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface InvitationBookProps {
@@ -173,9 +173,14 @@ const WeddingDecor = () => (
 const getEventDecor = (eventName: string) => {
   switch (eventName) {
     case 'Mehendi': return <MehendiDecor />;
-    case 'Sangeet': return <SangeetDecor />;
+    case 'Churmati': return <MehendiDecor />;
     case 'Haldi': return <HaldiDecor />;
-    case 'Wedding': return <WeddingDecor />;
+    case 'Sangeet': return <SangeetDecor />;
+    case 'Engagement': return <WeddingDecor />;
+    case 'Barat': return <WeddingDecor />;
+    case 'Sadi': return <WeddingDecor />;
+    case 'Reception': return <SangeetDecor />;
+    case 'Satyanarayan Katha Puja': return <HaldiDecor />;
     default: return null;
   }
 };
@@ -187,22 +192,22 @@ const EVENTS = [
     description: 'Join us for the beautiful tradition of Mehendi, where intricate henna designs tell stories of love and celebration.',
     color: '#ff6b35',
     icon: '🎨',
+    date: '19 Feb 2026',
     schedule: [
-      { time: '4:00 PM', activity: 'Welcome & Refreshments', icon: '🍹' },
-      { time: '5:00 PM', activity: 'Mehendi Application Begins', icon: '✋' },
-      { time: '7:00 PM', activity: 'Music & Entertainment', icon: '🎵' },
+      { time: 'Evening', activity: 'Mehendi Ceremony', icon: '✋' },
+      { time: 'Location', activity: 'Home Bijabhat', icon: '🏠' },
     ]
   },
   {
-    name: 'Sangeet',
-    subtitle: 'Dance & Celebration',
-    description: 'A night of music, dance, and joy as families come together to celebrate with traditional performances.',
-    color: '#ff69b4',
-    icon: '💃',
+    name: 'Churmati',
+    subtitle: 'Traditional Welcome',
+    description: 'A morning celebration with breakfast to welcome the wedding festivities.',
+    color: '#ff9f40',
+    icon: '🌅',
+    date: '20 Feb 2026',
     schedule: [
-      { time: '6:00 PM', activity: 'Cocktails & Mingling', icon: '🍸' },
-      { time: '7:30 PM', activity: 'Family Performances', icon: '🎤' },
-      { time: '9:00 PM', activity: 'DJ & Dance Floor', icon: '🎧' },
+      { time: 'Morning', activity: 'Breakfast', icon: '🍳' },
+      { time: 'Location', activity: 'Town Hall', icon: '🏛️' },
     ]
   },
   {
@@ -211,23 +216,82 @@ const EVENTS = [
     description: 'The sacred turmeric ceremony where blessings are showered upon the couple for a prosperous life ahead.',
     color: '#ffd700',
     icon: '✨',
+    date: '20 Feb 2026',
     schedule: [
-      { time: '10:00 AM', activity: 'Traditional Pooja', icon: '🪔' },
-      { time: '11:00 AM', activity: 'Haldi Ceremony', icon: '💛' },
-      { time: '1:00 PM', activity: 'Lunch & Celebration', icon: '🍽️' },
+      { time: 'Afternoon', activity: 'Haldi Ceremony', icon: '💛' },
+      { time: 'Afternoon', activity: 'Lunch', icon: '🍽️' },
     ]
   },
   {
-    name: 'Wedding',
-    subtitle: 'Two Souls, One Journey',
-    description: 'The moment when two hearts become one, surrounded by love, blessings, and eternal promises.',
-    color: '#d4af37',
-    icon: '💍',
+    name: 'Sangeet',
+    subtitle: 'Dance & Celebration',
+    description: 'A night of music, dance, and joy as families come together to celebrate with traditional performances.',
+    color: '#ff69b4',
+    icon: '💃',
+    date: '20 Feb 2026',
     schedule: [
-      { time: '6:00 PM', activity: 'Baraat Arrival', icon: '🐴' },
-      { time: '7:00 PM', activity: 'Jaimala Ceremony', icon: '💐' },
-      { time: '8:30 PM', activity: 'Pheras & Vows', icon: '🔥' },
-      { time: '10:00 PM', activity: 'Vidaai & Reception', icon: '🎊' },
+      { time: 'Evening', activity: 'Dance & Music', icon: '🎵' },
+      { time: 'Evening', activity: 'Dinner', icon: '🍽️' },
+    ]
+  },
+  {
+    name: 'Engagement',
+    subtitle: 'The Promise',
+    description: 'The formal engagement ceremony marking the beginning of the wedding celebrations.',
+    color: '#c77dff',
+    icon: '💍',
+    date: '21 Feb 2026',
+    schedule: [
+      { time: 'Morning', activity: 'Engagement Ceremony', icon: '💍' },
+      { time: 'Morning', activity: 'Breakfast', icon: '🍳' },
+    ]
+  },
+  {
+    name: 'Barat',
+    subtitle: 'The Procession',
+    description: 'The groom\'s procession arriving with pomp and celebration.',
+    color: '#4a90e2',
+    icon: '🐴',
+    date: '21 Feb 2026',
+    schedule: [
+      { time: 'Lunch Time', activity: 'Barat Arrival', icon: '🎉' },
+      { time: 'Lunch Time', activity: 'Lunch', icon: '🍽️' },
+    ]
+  },
+  {
+    name: 'Sadi',
+    subtitle: 'The Wedding',
+    description: 'The sacred wedding ceremony where two souls unite in holy matrimony.',
+    color: '#d4af37',
+    icon: '🔥',
+    date: '21 Feb 2026',
+    schedule: [
+      { time: 'Evening', activity: 'Wedding Ceremony', icon: '💐' },
+      { time: 'Evening', activity: 'Pheras & Vows', icon: '🔥' },
+    ]
+  },
+  {
+    name: 'Reception',
+    subtitle: 'Celebration',
+    description: 'An evening of celebration, music, and joy with family and friends.',
+    color: '#ff1493',
+    icon: '🎊',
+    date: '21 Feb 2026',
+    schedule: [
+      { time: 'Night', activity: 'Reception Party', icon: '🎉' },
+      { time: 'Night', activity: 'Dinner', icon: '🍽️' },
+    ]
+  },
+  {
+    name: 'Satyanarayan Katha Puja',
+    subtitle: 'Divine Blessings',
+    description: 'A sacred prayer ceremony seeking blessings for the newlyweds\' journey together.',
+    color: '#8b4513',
+    icon: '🪔',
+    date: '22 Feb 2026',
+    schedule: [
+      { time: 'Morning', activity: 'Puja Ceremony', icon: '🪔' },
+      { time: 'Location', activity: 'Home Bijabhat', icon: '🏠' },
     ]
   }
 ];
@@ -235,8 +299,14 @@ const EVENTS = [
 const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState<string | null>(null);
+  const [currentCoupleIndex, setCurrentCoupleIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const couples = [
+    { groom: 'Amit', bride: 'Ranjana' },
+    { groom: 'Laxminarayan', bride: 'Pratima' }
+  ];
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -264,6 +334,15 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
       }, 100);
     }
   }, []);
+
+  // Auto-transition between couples
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentCoupleIndex((prev) => (prev + 1) % couples.length);
+    }, 3000); // Change couple every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [couples.length]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] overflow-hidden">
@@ -304,6 +383,42 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
               <div className="cover-content">
                 <h1 className="cover-title">Wedding Invitation</h1>
                 <h2 className="cover-subtitle">A Celebration of Love</h2>
+                
+                {/* Couple Names with Transition Effect */}
+                <div className="couple-names-container" style={{ minHeight: '80px', marginBottom: '1.5rem' }}>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentCoupleIndex}
+                      className="couple-names"
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                      transition={{ duration: 0.6, ease: 'easeInOut' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.75rem',
+                        fontFamily: "'Dancing Script', cursive",
+                        fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
+                        fontWeight: 700,
+                        color: '#fff',
+                        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+                      }}
+                    >
+                      <span>{couples[currentCoupleIndex].groom}</span>
+                      <motion.span 
+                        animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}
+                      >
+                        💕
+                      </motion.span>
+                      <span>{couples[currentCoupleIndex].bride}</span>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                
                 <div className="cover-icon">💒</div>
                 <motion.button
                   onClick={handleOpen}
@@ -331,6 +446,41 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
               <div className="menu-header">
                 <h1 className="menu-title">Wedding Celebration</h1>
                 <h2 className="menu-subtitle">Join Us in Our Journey</h2>
+                
+                {/* Couple Names with Transition Effect in Header */}
+                <div className="menu-couple-names" style={{ minHeight: '50px', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentCoupleIndex}
+                      className="couple-names-header"
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        fontFamily: "'Dancing Script', cursive",
+                        fontSize: 'clamp(1.2rem, 3vw, 1.6rem)',
+                        fontWeight: 600,
+                        color: '#800020',
+                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                      }}
+                    >
+                      <span>{couples[currentCoupleIndex].groom}</span>
+                      <motion.span 
+                        animate={{ scale: [1, 1.15, 1] }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                      >
+                        💕
+                      </motion.span>
+                      <span>{couples[currentCoupleIndex].bride}</span>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                
                 <button
                   onClick={handleClose}
                   className="menu-close"
@@ -353,9 +503,14 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
                       <div className="section-title-group">
                         <h3 className="section-title">{event.name}</h3>
                         <p className="section-subtitle">{event.subtitle}</p>
+                        <p className="section-subtitle">{event.date}</p>
                       </div>
                       <span className="section-toggle">
-                        {currentSection === event.name ? '−' : '+'}
+                        {currentSection === event.name ? (
+                          '−'
+                        ) : (
+                          <span className="view-detail-text">View Detail</span>
+                        )}
                       </span>
                     </button>
                     <AnimatePresence>
@@ -385,7 +540,7 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
                             {/* Event Schedule List */}
                             <div className="event-schedule">
                               <h4 className="schedule-title" style={{ color: event.color }}>
-                                📅 Event Schedule
+                                📅 Event Schedule ({event.date})
                               </h4>
                               <ul className="schedule-list">
                                 {event.schedule.map((item, idx) => (
