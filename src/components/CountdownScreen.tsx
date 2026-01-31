@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface CountdownScreenProps {
   onComplete: () => void;
+  onBeforeComplete?: () => void;
   weddingDate: Date;
 }
 
@@ -21,10 +22,14 @@ const couples = [
   { groom: 'Laxminarayan', bride: 'Pratima' }
 ];
 
-const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDate }) => {
+const GOOGLE_MAPS_EMBED_URL =
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3707.0519887374157!2d81.51810577621987!3d21.700705580122108!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a2855418f94c5e3%3A0xd1f38aa89352bd0d!2sTown%20Hall%20Bemetara!5e0!3m2!1sen!2sin!4v1769675035630!5m2!1sen!2sin';
+
+const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, onBeforeComplete, weddingDate }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [mounted, setMounted] = useState(false);
   const [currentCoupleIndex, setCurrentCoupleIndex] = useState(0);
+  const [showLocation, setShowLocation] = useState(false);
 
   const calculateTimeLeft = useCallback((): TimeLeft => {
     const now = new Date().getTime();
@@ -67,6 +72,43 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
 
   if (!mounted) {
     return null;
+  }
+
+  // Location view: map + back button
+  if (showLocation) {
+    return (
+      <div className="fixed inset-0 z-[100] flex flex-col bg-[#1a1a2e]">
+        {/* Back button */}
+        <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-[#16213e] border-b border-[#d4af37]/30">
+          <button
+            type="button"
+            onClick={() => setShowLocation(false)}
+            className="unified-button flex items-center gap-2"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <span className="text-[#f4e4bc] font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            Wedding Location
+          </span>
+        </div>
+        {/* Map embed */}
+        <div className="flex-1 min-h-0 w-full p-2 sm:p-4 flex flex-col">
+          <iframe
+            src={GOOGLE_MAPS_EMBED_URL}
+            className="w-full flex-1 min-h-[300px] rounded-lg"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Wedding venue location - Town Hall Bemetara"
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -148,23 +190,18 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentCoupleIndex}
-              className="flex items-center justify-center flex-wrap gap-2 sm:gap-3"
+              className="couple-names-responsive"
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
               transition={{ duration: 0.6, ease: 'easeInOut' }}
-              style={{
-                position: 'relative',
-                textAlign: 'center',
-                maxWidth: '100%',
-              }}
             >
               {/* Groom name - fancy highlighted */}
               <motion.span 
+                className="couple-name-groom"
                 style={{ 
-                  whiteSpace: 'nowrap',
                   fontFamily: "'Dancing Script', cursive",
-                  fontSize: 'clamp(2.5rem, 1.5rem, 4.5rem)',
+                  fontSize: 'clamp(2rem, 5vw, 4.5rem)',
                   fontWeight: 800,
                   color: '#ff6b35',
                   textShadow: `
@@ -195,6 +232,7 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
               
               {/* Heart icon - enhanced */}
               <motion.span 
+                className="couple-heart-icon"
                 animate={{ 
                   scale: [1, 1.3, 1], 
                   rotate: [0, 15, -15, 0],
@@ -213,10 +251,10 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
               
               {/* Bride name - fancy highlighted */}
               <motion.span 
+                className="couple-name-bride"
                 style={{ 
-                  whiteSpace: 'nowrap',
                   fontFamily: "'Dancing Script', cursive",
-                  fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                  fontSize: 'clamp(2rem, 5vw, 3.5rem)',
                   fontWeight: 800,
                   color: '#ff1493',
                   textShadow: `
@@ -401,7 +439,7 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
               color: '#1a1a1a'
             }}
           >
-            21st February 2026
+            20-21 st February 2026
           </span>
         </motion.div>
 
@@ -471,47 +509,53 @@ const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete, weddingDa
           ))}
         </motion.div>
 
-        {/* Continue Button */}
-        <motion.button
-          className="mt-6 flex items-center gap-3 px-8 py-3 rounded-full cursor-pointer"
-          style={{
-            background: '#ff1493',
-            border: '4px solid #1a1a1a',
-            boxShadow: '6px 6px 0 #1a1a1a'
-          }}
-          onClick={onComplete}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-          whileHover={{ 
-            x: -2, 
-            y: -2,
-            boxShadow: '8px 8px 0 #1a1a1a'
-          }}
-          whileTap={{ 
-            x: 2, 
-            y: 2,
-            boxShadow: '2px 2px 0 #1a1a1a'
-          }}
-        >
-          <span 
-            style={{
-              fontFamily: "'Poppins', sans-serif",
-              fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
-              fontWeight: 700,
-              color: '#fff',
-              letterSpacing: '1px'
+        {/* Buttons: View Full Events + View Location */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-6">
+          <motion.button
+            className="unified-button flex items-center gap-2"
+            onClick={() => {
+              onBeforeComplete?.();
+              onComplete();
             }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            Begin Our Journey
-          </span>
-          <motion.span
-            animate={{ x: [0, 5, 0] }}
-            transition={{ duration: 0.8, repeat: Infinity }}
+            <span>View Full Events</span>
+            <motion.svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </motion.svg>
+          </motion.button>
+          <motion.button
+            type="button"
+            className="unified-button flex items-center gap-2"
+            onClick={() => setShowLocation(true)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3, duration: 0.6 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            💝
-          </motion.span>
-        </motion.button>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>View Location</span>
+          </motion.button>
+        </div>
       </div>
     </div>
   );

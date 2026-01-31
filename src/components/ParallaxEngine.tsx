@@ -8,6 +8,7 @@ interface ParallaxEngineProps {
   onProgress: (progress: number) => void;
   onPositionChange: (position: number) => void;
   onDirectionChange?: (direction: 'left' | 'right' | 'idle') => void;
+  onJump?: () => void;
 }
 
 const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
@@ -16,6 +17,7 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
   onProgress,
   onPositionChange,
   onDirectionChange,
+  onJump,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef(0);
@@ -125,6 +127,10 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
           keysDown.add('left');
           startMoving('left');
         }
+      } else if (key === 'arrowup' || key === 'w' || key === ' ') {
+        e.preventDefault();
+        // Trigger jump on up arrow, W key, or spacebar
+        onJump?.();
       }
     };
 
@@ -162,7 +168,7 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
     };
-  }, [startMoving, stopMoving]);
+  }, [startMoving, stopMoving, onJump]);
 
   // Touch/swipe controls
   useEffect(() => {
@@ -264,9 +270,9 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
 
       {/* Mobile controls */}
       {isMobile && (
-        <div className={`fixed left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 z-50 safe-area-bottom ${isLandscape ? 'bottom-2' : 'bottom-4 sm:bottom-6'}`}>
+        <div className={`z-[999] fixed left-1/2 -translate-x-1/2 flex items-center gap-4 sm:gap-6 z-50 safe-area-bottom ${isLandscape ? 'bottom-2' : 'bottom-4 sm:bottom-6'}`}>
           <button
-            className="!mr-[1rem] mobile-btn w-14 h-14 sm:w-16 sm:h-16 rounded-full glass flex items-center justify-center active:scale-90 active:bg-[#d4af37]/20 transition-all shadow-lg border-2 border-[#d4af37]/40"
+            className="z-100 !mr-[1rem] mobile-btn w-14 h-14 sm:w-16 sm:h-16 rounded-full glass flex items-center justify-center active:scale-90 active:bg-[#d4af37]/20 transition-all shadow-lg border-2 border-[#d4af37]/40"
             onTouchStart={(e) => { e.stopPropagation(); startMoving('left'); }}
             onTouchEnd={(e) => { e.stopPropagation(); stopMoving(); }}
             onTouchCancel={(e) => { e.stopPropagation(); stopMoving(); }}
@@ -277,6 +283,15 @@ const ParallaxEngine: React.FC<ParallaxEngineProps> = ({
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            className="mobile-btn w-14 h-14 sm:w-16 sm:h-16 rounded-full glass flex items-center justify-center active:scale-90 active:bg-[#d4af37]/20 transition-all shadow-lg border-2 border-[#d4af37]/40"
+            onClick={(e) => { e.stopPropagation(); onJump?.(); }}
+            aria-label="Jump"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
           </button>
           <button

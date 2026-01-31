@@ -8,10 +8,11 @@ interface CharacterProps {
   facingLeft?: boolean;
   isHugging?: boolean;
   isDancing?: boolean;
+  isJumping?: boolean;
 }
 
 // Groom character - Indian wedding attire (Sherwani)
-export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLeft = false, isHugging = false, isDancing = false }) => {
+export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLeft = false, isHugging = false, isDancing = false, isJumping = false }) => {
   const [frame, setFrame] = React.useState(0);
 
   React.useEffect(() => {
@@ -40,7 +41,10 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
 
   // Dancing animation - jumping and dancing
   const danceCycle = frame / 8;
-  const jumpHeight = isDancing ? Math.abs(Math.sin(danceCycle * Math.PI * 2)) * 25 : 0;
+  // Manual jump: translate up by half screen height (window.innerHeight / 2)
+  const manualJumpHeight = isJumping ? (typeof window !== 'undefined' ? window.innerHeight / 2 : 400) : 0;
+  const danceJumpHeight = isDancing ? Math.abs(Math.sin(danceCycle * Math.PI * 2)) * 25 : 0;
+  const jumpHeight = isJumping ? manualJumpHeight : danceJumpHeight;
   const danceRotation = isDancing ? Math.sin(danceCycle * Math.PI * 4) * 8 : 0;
   const danceBounce = isDancing ? Math.abs(Math.sin(danceCycle * Math.PI * 4)) * 15 : 0;
 
@@ -64,8 +68,8 @@ export const Groom: React.FC<CharacterProps> = ({ isMoving, scale = 1, facingLef
       viewBox="0 0 80 140"
       className="gpu-accelerate"
       style={{ 
-        transform: `translateY(${isDancing ? -jumpHeight - danceBounce : (isMoving ? -bodyBob : 0)}px) rotate(${isDancing ? danceRotation : 0}deg) scaleX(${facingLeft ? -1 : 1})`,
-        transition: isDancing ? 'none' : 'transform 0.1s ease-out',
+        transform: `translateY(${isJumping ? -jumpHeight : (isDancing ? -danceJumpHeight - danceBounce : (isMoving ? -bodyBob : 0))}px) rotate(${isDancing ? danceRotation : 0}deg) scaleX(${facingLeft ? -1 : 1})`,
+        transition: isJumping ? 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : (isDancing ? 'none' : 'transform 0.1s ease-out'),
       }}
     >
       {/* Shadow */}

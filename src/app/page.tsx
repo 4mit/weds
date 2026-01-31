@@ -31,14 +31,17 @@ import {
 } from '@/components/WeddingScenes';
 import DiscoLights from '@/components/DiscoLights';
 import SoundManager from '@/components/SoundManager';
+import IntroMusicManager, { type IntroMusicManagerRef } from '@/components/IntroMusicManager';
+import SharePageView from '@/components/SharePageView';
 import SangeetMusicManager from '@/components/SangeetMusicManager';
 import WeddingMusicManager from '@/components/WeddingMusicManager';
 import BaratMusicManager from '@/components/BaratMusicManager';
 import Fireworks from '@/components/Fireworks';
 import WeddingLights from '@/components/WeddingLights';
+import Analytics from '@/components/Analytics';
 
 // Wedding date - February 21, 2026
-const WEDDING_DATE = new Date('2026-02-21T00:00:00');
+const WEDDING_DATE = new Date('2026-02-20T00:00:00');
 
 // World configuration - responsive (extended for all events)
 const getWorldWidth = (isMobile: boolean) => isMobile ? 10000 : 20000;
@@ -166,6 +169,9 @@ export default function WeddingJourney() {
   const [score, setScore] = useState(0);
   const crossedSectionsRef = useRef<Set<string>>(new Set());
   const [showHeadphonePopup, setShowHeadphonePopup] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
+  const introMusicRef = useRef<IntroMusicManagerRef | null>(null);
+  const [showSharePage, setShowSharePage] = useState(false);
 
   const handleCountdownComplete = useCallback(() => {
     setShowCountdown(false);
@@ -186,7 +192,7 @@ export default function WeddingJourney() {
 
   useEffect(() => {
     if (gameStarted && showInstructions) {
-      const timer = setTimeout(() => setShowInstructions(false), 5000);
+      const timer = setTimeout(() => setShowInstructions(false), 7000);
       return () => clearTimeout(timer);
     }
   }, [gameStarted, showInstructions]);
@@ -257,6 +263,14 @@ export default function WeddingJourney() {
     }
   }, []);
 
+  const handleJump = useCallback(() => {
+    setIsJumping(true);
+    // Reset jump after animation completes (500ms for smooth jump up, then smooth return)
+    setTimeout(() => {
+      setIsJumping(false);
+    }, 500);
+  }, []);
+
   // Track section crossings and award points
   useEffect(() => {
     if (!gameStarted) return;
@@ -296,14 +310,105 @@ export default function WeddingJourney() {
   // Sadi is at position 0.68 (68%) - match WeddingMusicManager boundaries
   const isInWeddingSection = progress >= 0.63 && progress <= 0.73;
 
-  // Show countdown screen first
-  if (showCountdown) {
-    return <CountdownScreen onComplete={handleCountdownComplete} weddingDate={WEDDING_DATE} />;
-  }
+  // Calculate current section for analytics
+  const currentSection = SECTIONS.find((s, i) => {
+    const next = SECTIONS[i + 1];
+    return progress >= s.position && (!next || progress < next.position);
+  })?.name || 'Start';
 
-  // Then show start screen
+  // Add structured data for SEO (must be before conditional returns)
+  useEffect(() => {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": "Soni Family Wedding",
+      "description": `Join us for the beautiful wedding celebration of Amit & Ranjana, Laxminarayan & Pratima on February 21, 2026. Experience our interactive wedding journey featuring Mehendi, Haldi, Sangeet, Engagement, Barat, Wedding, Reception, and Satyanarayan Katha Puja ceremonies.`,
+      "startDate": "2026-02-19T00:00:00",
+      "endDate": "2026-02-22T23:59:59",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "Place",
+        "name": "Wedding Venue",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bijabhat",
+          "addressCountry": "IN"
+        }
+      },
+      "organizer": {
+        "@type": "Organization",
+        "name": "Soni Family"
+      },
+      "performer": [
+        {
+          "@type": "Person",
+          "name": "Amit & Ranjana"
+        },
+        {
+          "@type": "Person",
+          "name": "Laxminarayan & Pratima"
+        }
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "url": process.env.NEXT_PUBLIC_SITE_URL || "https://soni-wedding.com"
+      }
+    };
+
+    // Remove existing structured data script if any
+    const existingScript = document.getElementById('wedding-structured-data');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Add new structured data script
+    const script = document.createElement('script');
+    script.id = 'wedding-structured-data';
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById('wedding-structured-data');
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, []);
+
+  // Intro music: one instance from app load until invitation ends (stays loaded across countdown → start)
+  const showIntroMusic = !gameStarted;
+
+  // Show countdown or start screen (invitation)
   if (!gameStarted) {
-    return <StartScreen onStart={handleStart} />;
+    return (
+      <>
+        <IntroMusicManager
+          ref={introMusicRef}
+          isPlaying={showIntroMusic}
+          showSpectrum={showSharePage}
+        />
+        {showCountdown ? (
+          <CountdownScreen
+            onComplete={handleCountdownComplete}
+            onBeforeComplete={() => introMusicRef.current?.play()}
+            weddingDate={WEDDING_DATE}
+          />
+        ) : showSharePage ? (
+          <SharePageView onBack={() => setShowSharePage(false)} />
+        ) : (
+          <StartScreen
+            onStart={handleStart}
+            onFirstTap={() => introMusicRef.current?.play()}
+            onOpenSharePage={() => setShowSharePage(true)}
+          />
+        )}
+      </>
+    );
   }
 
   return (
@@ -332,6 +437,7 @@ export default function WeddingJourney() {
         onProgress={handleProgress}
         onPositionChange={handlePositionChange}
         onDirectionChange={handleDirectionChange}
+        onJump={handleJump}
       >
         {/* ========== SKY LAYER (Parallax 0.1) ========== */}
         <div
@@ -512,12 +618,12 @@ export default function WeddingJourney() {
               WelcomeGate: 300px width -> scaled 0.5 = 150px (mobile), scaled 1 = 300px (desktop)
               We want a large gap between them, so position gate much further right */}
           
-          {/* GroomHome - positioned on the far left */}
+          {/* GroomHome - positioned on the far left - bigger size */}
           <div 
             className="absolute bottom-[15%] origin-bottom-left"
             style={{ 
               left: isMobile ? '80px' : 0,
-              transform: isMobile ? 'scale(0.5)' : 'scale(1)'
+              transform: isMobile ? 'scale(0.75)' : 'scale(1.3)'
             }}
           >
             <GroomHome x={0} />
@@ -527,7 +633,7 @@ export default function WeddingJourney() {
           <AnimatePresence>
             {showHeadphonePopup && gameStarted && (
               <motion.div
-                className="fixed top-[40%] left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+                className="fixed top-[20%] left-1/2 -translate-x-1/2 z-50 pointer-events-none"
                 initial={{ opacity: 0, scale: 0.8, y: -20 }}
                 animate={{ 
                   opacity: [0.7, 1, 0.7, 1, 0.7, 1],
@@ -1263,25 +1369,72 @@ export default function WeddingJourney() {
           facingLeft={facingDirection === 'left'}
           isHugging={isHugging}
           isDancing={isInSangeetSection || isInBaratSection}
+          isJumping={isJumping}
         />
       </div>
+
+    
+      
+      {/* Stylish Instructions Popup */}
+      <AnimatePresence>
+        {showInstructions && (
+          <motion.div
+            className="fixed top-[20%] sm:bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-40"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          >
+            <div 
+              className="relative bg-gradient-to-br from-[#800020]/95 via-[#a00030]/95 to-[#800020]/95 backdrop-blur-md rounded-2xl px-5 py-3 sm:px-6 sm:py-4 border-2 border-[#d4af37]/60 shadow-2xl"
+              style={{
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              }}
+            >
+              {/* Decorative corner accents */}
+              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#d4af37] rounded-tl-lg" />
+              <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#d4af37] rounded-tr-lg" />
+              <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#d4af37] rounded-bl-lg" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#d4af37] rounded-br-lg" />
+              
+              {/* Content */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Icon */}
+                <div className="text-[#d4af37] text-lg sm:text-xl">
+                  {isMobile ? '👆' : '⌨️'}
+                </div>
+                
+                {/* Message */}
+                <p 
+                  className="text-[#f4e4bc] text-xs sm:text-sm md:text-base font-medium text-center whitespace-nowrap"
+                  
+                  style={{ fontFamily: 'Poppins, sans-serif', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)', }}
+                >
+                  {isMobile ? (
+                    <>Use Headphone for better Experiance→</>
+                  ) : (
+                    <> </>
+                  )}
+                </p>
+              </div>
+              
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#d4af37]/10 to-transparent pointer-events-none" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ========== INSTRUCTIONS OVERLAY ========== */}
       <AnimatePresence>
         {showInstructions && (
           <motion.div
-            className="fixed bottom-20 sm:bottom-24 md:bottom-16 left-1/2 -translate-x-1/2 z-40 glass rounded-lg sm:rounded-xl px-4 sm:px-6 py-2 sm:py-3"
+            className="fixed top-40 sm:bottom-24 md:bottom-16 left-1/2 -translate-x-1/2 z-40 glass rounded-lg sm:rounded-xl px-4 sm:px-6 py-2 sm:py-3"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
           >
-            <p className="text-[#f4e4bc] text-xs sm:text-sm md:text-base text-center whitespace-nowrap">
-              {isMobile ? (
-                <>Swipe or tap buttons to move →</>
-              ) : (
-                <>Use Arrow Keys ← → or Scroll to navigate</>
-              )}
-            </p>
+            
           </motion.div>
         )}
       </AnimatePresence>
@@ -1317,6 +1470,12 @@ export default function WeddingJourney() {
       {/* ========== WEDDING MUSIC MANAGER ========== */}
       <WeddingMusicManager 
         progress={progress}
+      />
+
+      {/* ========== ANALYTICS ========== */}
+      <Analytics 
+        progress={progress}
+        currentSection={currentSection}
       />
     </div>
   );

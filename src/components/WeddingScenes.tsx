@@ -2015,10 +2015,10 @@ export const WeddingHall: React.FC<{ x: number }> = ({ x }) => (
   </div>
 );
 
-// Groom's Home (Starting point)
+// Groom's Home (Starting point) - Bigger size
 export const GroomHome: React.FC<{ x: number }> = ({ x }) => (
   <div className={x === 0 ? "relative" : "absolute bottom-[10%]"} style={x !== 0 ? { left: x } : undefined}>
-    <svg width="350" height="320" viewBox="0 0 350 320">
+    <svg width="450" height="410" viewBox="0 0 350 320">
       {/* Main house */}
       <rect x="50" y="120" width="250" height="200" fill="#e8d4b8" stroke="#8b4513" strokeWidth="3" />
       

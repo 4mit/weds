@@ -240,7 +240,7 @@ const EVENTS = [
     description: 'The formal engagement ceremony marking the beginning of the wedding celebrations.',
     color: '#c77dff',
     icon: '💍',
-    date: '21 Feb 2026',
+    date: '20 Feb 2026',
     schedule: [
       { time: 'Morning', activity: 'Engagement Ceremony', icon: '💍' },
       { time: 'Morning', activity: 'Breakfast', icon: '🍳' },
@@ -252,7 +252,7 @@ const EVENTS = [
     description: 'The groom\'s procession arriving with pomp and celebration.',
     color: '#4a90e2',
     icon: '🐴',
-    date: '21 Feb 2026',
+    date: '20 Feb 2026',
     schedule: [
       { time: 'Lunch Time', activity: 'Barat Arrival', icon: '🎉' },
       { time: 'Lunch Time', activity: 'Lunch', icon: '🍽️' },
@@ -264,7 +264,7 @@ const EVENTS = [
     description: 'The sacred wedding ceremony where two souls unite in holy matrimony.',
     color: '#d4af37',
     icon: '🔥',
-    date: '21 Feb 2026',
+    date: '20 Feb 2026',
     schedule: [
       { time: 'Evening', activity: 'Wedding Ceremony', icon: '💐' },
       { time: 'Evening', activity: 'Pheras & Vows', icon: '🔥' },
@@ -276,7 +276,7 @@ const EVENTS = [
     description: 'An evening of celebration, music, and joy with family and friends.',
     color: '#ff1493',
     icon: '🎊',
-    date: '21 Feb 2026',
+    date: '20 Feb 2026',
     schedule: [
       { time: 'Night', activity: 'Reception Party', icon: '🎉' },
       { time: 'Night', activity: 'Dinner', icon: '🍽️' },
@@ -300,6 +300,7 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState<string | null>(null);
   const [currentCoupleIndex, setCurrentCoupleIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -344,6 +345,16 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
     return () => clearInterval(interval);
   }, [couples.length]);
 
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] overflow-hidden">
       {/* Decorative background */}
@@ -380,49 +391,203 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
             style={{ transformStyle: 'preserve-3d' }}
           >
             <div className="menu-cover-front">
-              <div className="cover-content">
-                <h1 className="cover-title">Wedding Invitation</h1>
-                <h2 className="cover-subtitle">A Celebration of Love</h2>
-                
-                {/* Couple Names with Transition Effect */}
-                <div className="couple-names-container" style={{ minHeight: '80px', marginBottom: '1.5rem' }}>
+              {/* Subtle Background Pattern */}
+              <div className="cover-bg-pattern"></div>
+              
+              {/* Gold Border Frame */}
+              <div className="cover-gold-border"></div>
+
+              {/* Large Red Flower - Top Left */}
+              <div className="cover-flower cover-flower-tl">
+                <svg viewBox="0 0 200 200" className="flower-svg">
+                  {/* Large Red Flower */}
+                  <g transform="translate(100, 100)">
+                    {/* Outer petals */}
+                    {[...Array(8)].map((_, i) => (
+                      <ellipse
+                        key={i}
+                        cx={0}
+                        cy={-50}
+                        rx="25"
+                        ry="60"
+                        fill="#800020"
+                        transform={`rotate(${i * 45} 0 0)`}
+                        opacity="0.9"
+                      />
+                    ))}
+                    {/* Inner petals */}
+                    {[...Array(6)].map((_, i) => (
+                      <ellipse
+                        key={i}
+                        cx={0}
+                        cy={-35}
+                        rx="18"
+                        ry="45"
+                        fill="#a00030"
+                        transform={`rotate(${i * 60} 0 0)`}
+                        opacity="0.8"
+                      />
+                    ))}
+                    {/* Gold center */}
+                    <circle cx="0" cy="0" r="25" fill="#d4af37" opacity="0.9" />
+                    <circle cx="0" cy="0" r="15" fill="#ffd700" opacity="0.8" />
+                  </g>
+                  {/* Small buds */}
+                  <circle cx="40" cy="40" r="8" fill="#800020" opacity="0.7" />
+                  <circle cx="160" cy="50" r="6" fill="#a00030" opacity="0.6" />
+                  <circle cx="50" cy="160" r="7" fill="#800020" opacity="0.7" />
+                </svg>
+              </div>
+
+              {/* Large Red Flower - Bottom Right */}
+              <div className="cover-flower cover-flower-br">
+                <svg viewBox="0 0 200 200" className="flower-svg">
+                  <g transform="translate(100, 100)">
+                    {[...Array(8)].map((_, i) => (
+                      <ellipse
+                        key={i}
+                        cx={0}
+                        cy={-50}
+                        rx="25"
+                        ry="60"
+                        fill="#800020"
+                        transform={`rotate(${i * 45} 0 0)`}
+                        opacity="0.9"
+                      />
+                    ))}
+                    {[...Array(6)].map((_, i) => (
+                      <ellipse
+                        key={i}
+                        cx={0}
+                        cy={-35}
+                        rx="18"
+                        ry="45"
+                        fill="#a00030"
+                        transform={`rotate(${i * 60} 0 0)`}
+                        opacity="0.8"
+                      />
+                    ))}
+                    <circle cx="0" cy="0" r="25" fill="#d4af37" opacity="0.9" />
+                    <circle cx="0" cy="0" r="15" fill="#ffd700" opacity="0.8" />
+                  </g>
+                  <circle cx="40" cy="40" r="8" fill="#800020" opacity="0.7" />
+                  <circle cx="160" cy="50" r="6" fill="#a00030" opacity="0.6" />
+                  <circle cx="50" cy="160" r="7" fill="#800020" opacity="0.7" />
+                </svg>
+              </div>
+
+              {/* Gold Leaves and Vines */}
+              <div className="cover-leaves">
+                <svg viewBox="0 0 400 400" className="leaves-svg">
+                  {/* Top-left vines */}
+                  <path d="M50 50 Q100 80 150 120 T250 180" fill="none" stroke="#d4af37" strokeWidth="2" opacity="0.6" />
+                  <ellipse cx="120" cy="100" rx="15" ry="8" fill="#d4af37" opacity="0.5" transform="rotate(45 120 100)" />
+                  <ellipse cx="180" cy="140" rx="12" ry="6" fill="#b8941f" opacity="0.5" transform="rotate(-30 180 140)" />
+                  
+                  {/* Bottom-right vines */}
+                  <path d="M350 350 Q300 320 250 280 T150 220" fill="none" stroke="#d4af37" strokeWidth="2" opacity="0.6" />
+                  <ellipse cx="280" cy="300" rx="15" ry="8" fill="#d4af37" opacity="0.5" transform="rotate(-45 280 300)" />
+                  <ellipse cx="220" cy="260" rx="12" ry="6" fill="#b8941f" opacity="0.5" transform="rotate(30 220 260)" />
+                  
+                  {/* Top-right subtle gold elements */}
+                  <circle cx="320" cy="80" r="12" fill="#d4af37" opacity="0.3" />
+                  <ellipse cx="340" cy="120" rx="10" ry="5" fill="#b8941f" opacity="0.3" transform="rotate(60 340 120)" />
+                  
+                  {/* Bottom-left subtle gold elements */}
+                  <circle cx="80" cy="320" r="12" fill="#d4af37" opacity="0.3" />
+                  <ellipse cx="60" cy="280" rx="10" ry="5" fill="#b8941f" opacity="0.3" transform="rotate(-60 60 280)" />
+                </svg>
+              </div>
+
+              {/* Main Content */}
+              <div className="cover-content-new">
+                {/* Save The Date */}
+                <div className="save-the-date">
+                  <motion.div
+                    className="save-text"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  >
+                    Save
+                  </motion.div>
+                  <motion.div
+                    className="the-text"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    The
+                  </motion.div>
+                  <motion.div
+                    className="date-text"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                  >
+                    Date
+                  </motion.div>
+                </div>
+
+                {/* Wedding Off Text */}
+                <motion.div
+                  className="wedding-off"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                >
+                  THE WEDDING OF
+                </motion.div>
+
+                {/* Couple Names */}
+                <motion.div
+                  className="couple-names-new"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 1 }}
+                >
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentCoupleIndex}
-                      className="couple-names"
-                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                      transition={{ duration: 0.6, ease: 'easeInOut' }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.75rem',
-                        fontFamily: "'Dancing Script', cursive",
-                        fontSize: 'clamp(1.5rem, 4vw, 2.2rem)',
-                        fontWeight: 700,
-                        color: '#fff',
-                        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-                      }}
+                      className="couple-names-content"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4 }}
                     >
-                      <span>{couples[currentCoupleIndex].groom}</span>
-                      <motion.span 
-                        animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }}
-                      >
-                        💕
-                      </motion.span>
-                      <span>{couples[currentCoupleIndex].bride}</span>
+                      {couples[currentCoupleIndex].groom.toUpperCase()} & {couples[currentCoupleIndex].bride.toUpperCase()}
                     </motion.div>
                   </AnimatePresence>
-                </div>
-                
-                <div className="cover-icon">💒</div>
+                </motion.div>
+
+                {/* Date and Location */}
+                <motion.div
+                  className="wedding-details"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 1.2 }}
+                >
+                  <div className="wedding-date">20 FEBRUARY 2026 - 8:00 PM</div>
+                  <div className="wedding-location">Town Hall Bemetara</div>
+                </motion.div>
+
+                {/* Special Invite */}
+                <motion.div
+                  className="special-invite"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 1.4 }}
+                >
+                  SPECIAL INVITE
+                </motion.div>
+
+                {/* Button */}
                 <motion.button
                   onClick={handleOpen}
-                  className="cover-button"
+                  className="cover-button-new"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.6 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -640,7 +805,7 @@ const InvitationBook: React.FC<InvitationBookProps> = ({ onProceed }) => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Click to Begin Journey
+                  View Interactive Events
                   <motion.svg
                     width="24"
                     height="24"
